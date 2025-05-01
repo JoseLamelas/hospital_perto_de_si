@@ -18,23 +18,27 @@ $(document).ready(function() {
     const farmaciasLocalURL = "data/farmacias.geojson";
     
     // Inicialização quando a página home é exibida
-    $(document).on("pageshow", "#home", function() {
-        inicializarAplicacao();
-    });
+$(document).on("pageshow", "#home", function() {
+    inicializarAplicacao();
+});
+
+// Função de inicialização principal
+function inicializarAplicacao() {
+    // Obter localização do usuário (primeira vez)
+    solicitarLocalizacao();
+    
+    // Não é necessário configurar o evento de clique aqui se já está definido fora
+}
     
     // Inicialização quando a página de favoritos é exibida
     $(document).on("pageshow", "#favoritos", function() {
         atualizarListaFavoritos();
     });
     
-    // Função de inicialização principal
-    function inicializarAplicacao() {
-        // Obter localização do usuário
-        obterLocalizacaoAtual();
         
         // Configurar o botão de atualização de localização
         $("#atualizar-localizacao").on("click", function() {
-            obterLocalizacaoAtual();
+            solicitarLocalizacao();
         });
     }
     
