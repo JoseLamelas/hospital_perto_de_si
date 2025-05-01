@@ -18,90 +18,76 @@ $(document).ready(function() {
     const farmaciasLocalURL = "data/farmacias.geojson";
     
     // Inicialização quando a página home é exibida
-$(document).on("pageshow", "#home", function() {
-    inicializarAplicacao();
-});
-
-// Função de inicialização principal
-function inicializarAplicacao() {
-    // Obter localização do usuário (primeira vez)
-    solicitarLocalizacao();
-    
-    // Não é necessário configurar o evento de clique aqui se já está definido fora
-}
+    $(document).on("pageshow", "#home", function() {
+        inicializarAplicacao();
+    });
     
     // Inicialização quando a página de favoritos é exibida
     $(document).on("pageshow", "#favoritos", function() {
         atualizarListaFavoritos();
     });
     
+    // Função de inicialização principal
+    function inicializarAplicacao() {
+        // Obter localização do usuário
+        obterLocalizacaoAtual();
         
         // Configurar o botão de atualização de localização
         $("#atualizar-localizacao").on("click", function() {
-            solicitarLocalizacao();
+            obterLocalizacaoAtual();
         });
     }
     
-    // Modifique a função que é chamada quando o botão é clicado
-$("#atualizar-localizacao").on("click", function() {
-    // Força uma nova solicitação de geolocalização
-    if (navigator.geolocation) {
-        // Revogue qualquer permissão anterior (isso funciona em alguns navegadores)
-        if (navigator.permissions && navigator.permissions.revoke) {
-            try {
-                navigator.permissions.revoke({ name: 'geolocation' }).then(function() {
-                    // Agora solicita novamente
-                    solicitarLocalizacao();
-                });
-            } catch (e) {
-                // Se não conseguir revogar, tenta solicitar diretamente
-                solicitarLocalizacao();
-            }
+    // Obtém a localização atual do usuário
+    function obterLocalizacaoAtual() {
+        if (navigator.geolocation) {
+            $("#endereco-atual").text("Obtendo sua localização...");
+            
+            navigator.geolocation.getCurrentPosition(
+                function(posicao) {
+                    // Sucesso na obtenção da localização
+                    minhaLatitude = posicao.coords.latitude;
+                    minhaLongitude = posicao.coords.longitude;
+                    
+                    // Obter e exibir o endereço baseado nas coordenadas
+                    obterEnderecoDoUsuario(minhaLatitude, minhaLongitude);
+                    
+                    // Buscar hospitais e farmácias próximos
+                    buscarHospitaisProximos(minhaLatitude, minhaLongitude);
+                    buscarFarmaciasProximas(minhaLatitude, minhaLongitude);
+                },
+                function(erro) {
+                    // Erro na obtenção da localização
+                    let mensagemErro;
+                    
+                    switch(erro.code) {
+                        case erro.PERMISSION_DENIED:
+                            mensagemErro = "Acesso à localização negado pelo usuário.";
+                            break;
+                        case erro.POSITION_UNAVAILABLE:
+                            mensagemErro = "Localização indisponível.";
+                            break;
+                        case erro.TIMEOUT:
+                            mensagemErro = "Tempo esgotado ao obter localização.";
+                            break;
+                        default:
+                            mensagemErro = "Erro desconhecido ao obter localização.";
+                    }
+                    
+                    $("#endereco-atual").text(mensagemErro);
+                    alert("Não foi possível obter sua localização: " + mensagemErro);
+                },
+                { 
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
         } else {
-            // Navegadores sem suporte a revoke
-            solicitarLocalizacao();
+            $("#endereco-atual").text("Geolocalização não suportada por este navegador.");
+            alert("Seu navegador não suporta geolocalização.");
         }
-    } else {
-        alert("Seu navegador não suporta geolocalização.");
     }
-});
-
-// Função para solicitar localização de forma consistente
-function solicitarLocalizacao() {
-    $("#endereco-atual").text("Obtendo sua localização...");
-    
-    // Importante: Use opções que forçam uma nova solicitação
-    const options = {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0  // Força a obter uma nova posição em vez de usar cache
-    };
-    
-    navigator.geolocation.getCurrentPosition(
-        function(posicao) {
-            // Callback de sucesso
-            minhaLatitude = posicao.coords.latitude;
-            minhaLongitude = posicao.coords.longitude;
-            
-            // Atualiza a interface
-            obterEnderecoDoUsuario(minhaLatitude, minhaLongitude);
-            buscarHospitaisProximos(minhaLatitude, minhaLongitude);
-            buscarFarmaciasProximas(minhaLatitude, minhaLongitude);
-        },
-        function(erro) {
-            // Callback de erro
-            console.error("Erro ao obter localização:", erro);
-            $("#endereco-atual").text("Erro ao obter localização: " + erro.message);
-            
-            // Se houver erro, pode utilizar uma localização padrão
-            minhaLatitude = 38.7223; // Lisboa como exemplo
-            minhaLongitude = -9.1393;
-            buscarHospitaisProximos(minhaLatitude, minhaLongitude);
-            buscarFarmaciasProximas(minhaLatitude, minhaLongitude);
-        },
-        options
-    );
-}
     
     // Obtém o endereço do usuário com base nas coordenadas
     function obterEnderecoDoUsuario(latitude, longitude) {
