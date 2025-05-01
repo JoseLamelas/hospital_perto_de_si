@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS Saúde Portugal</title>
+    
+    <!-- Referências jQuery Mobile -->
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<!-- Página Principal (Home) -->
+<div data-role="page" id="home">
+    <!-- Cabeçalho -->
+    <div data-role="header" class="cabecalho">
+        <h1>SOS Saúde</h1>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div role="main" class="ui-content conteudo">
+        <!-- Botão de Emergência SNS24 -->
+        <div class="secao-sns24">
+            <a href="tel:808242424" class="botao-sns24">
+                <img src="imagens/sns24-icon.png" alt="SNS24">
+                <span>Ligar SNS24</span>
+            </a>
+            <p class="info-sns24">Serviço disponível 24h/dia</p>
+        </div>
+        
+        <!-- Localização do Utilizador -->
+        <div class="secao-localizacao">
+            <h2>Sua Localização</h2>
+            <p id="endereco-atual">Obtendo sua localização...</p>
+            <button id="atualizar-localizacao" class="ui-btn ui-corner-all">Atualizar Localização</button>
+        </div>
+        
+        <!-- Serviços Próximos -->
+        <div class="secao-servicos">
+            <div data-role="tabs" id="tabs-servicos">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="#hospitais" data-ajax="false" class="ui-btn-active">Hospitais</a></li>
+                        <li><a href="#farmacias" data-ajax="false">Farmácias</a></li>
+                    </ul>
+                </div>
+                
+                <div id="hospitais" class="tab-conteudo">
+                    <h3>Hospitais Próximos</h3>
+                    <ul data-role="listview" id="lista-hospitais" class="lista-servicos">
+                        <li class="mensagem-carregando">Carregando hospitais próximos...</li>
+                    </ul>
+                </div>
+                
+                <div id="farmacias" class="tab-conteudo">
+                    <h3>Farmácias Próximas</h3>
+                    <ul data-role="listview" id="lista-farmacias" class="lista-servicos">
+                        <li class="mensagem-carregando">Carregando farmácias próximas...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Rodapé com Menu -->
+    <div data-role="footer" data-position="fixed" class="rodape">
+        <div data-role="navbar" class="menu-rodape">
+            <ul>
+                <li><a href="#home" data-icon="home" class="ui-btn-active">Início</a></li>
+                <li><a href="#favoritos" data-icon="star">Favoritos</a></li>
+                <li><a href="#contactos" data-icon="phone">Contactos</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Página de Favoritos -->
+<div data-role="page" id="favoritos">
+    <div data-role="header" class="cabecalho">
+        <h1>Favoritos</h1>
+    </div>
+    
+    <div role="main" class="ui-content conteudo">
+        <h2>Seus Locais Favoritos</h2>
+        <ul data-role="listview" id="lista-favoritos" class="lista-servicos">
+            <li class="sem-favoritos">Você ainda não adicionou favoritos.</li>
+        </ul>
+    </div>
+    
+    <div data-role="footer" data-position="fixed" class="rodape">
+        <div data-role="navbar" class="menu-rodape">
+            <ul>
+                <li><a href="#home" data-icon="home">Início</a></li>
+                <li><a href="#favoritos" data-icon="star" class="ui-btn-active">Favoritos</a></li>
+                <li><a href="#contactos" data-icon="phone">Contactos</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Página de Contactos de Emergência -->
+<div data-role="page" id="contactos">
+    <div data-role="header" class="cabecalho">
+        <h1>Contactos Urgentes</h1>
+    </div>
+    
+    <div role="main" class="ui-content conteudo">
+        <h2>Contactos de Emergência</h2>
+        <ul data-role="listview" class="lista-contactos">
+            <li>
+                <a href="tel:112">
+                    <h3>112</h3>
+                    <p>Número Europeu de Emergência</p>
+                </a>
+            </li>
+            <li>
+                <a href="tel:808242424">
+                    <h3>808 24 24 24</h3>
+                    <p>SNS 24</p>
+                </a>
+            </li>
+            <li>
+                <a href="tel:800202669">
+                    <h3>800 20 26 69</h3>
+                    <p>Linha de Apoio à Saúde Mental</p>
+                </a>
+            </li>
+            <li>
+                <a href="tel:144">
+                    <h3>144</h3>
+                    <p>Linha Nacional de Emergência Social</p>
+                </a>
+            </li>
+            <li>
+                <a href="tel:116111">
+                    <h3>116 111</h3>
+                    <p>SOS Criança</p>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div data-role="footer" data-position="fixed" class="rodape">
+        <div data-role="navbar" class="menu-rodape">
+            <ul>
+                <li><a href="#home" data-icon="home">Início</a></li>
+                <li><a href="#favoritos" data-icon="star">Favoritos</a></li>
+                <li><a href="#contactos" data-icon="phone" class="ui-btn-active">Contactos</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Script JavaScript -->
+<script src="app.js"></script>
+</body>
+</html>

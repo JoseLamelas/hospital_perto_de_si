@@ -1,0 +1,14 @@
+Field,Label,Value
+created,Created,2024-01-23T09:54:07.633981
+description,Description,GeoJSON
+format,File Format,GeoJSON
+download_url,Download URL,https://s3.dualstack.us-east-1.amazonaws.com/production-raw-data-api/ISO3/PRT/health_facilities/points/hotosm_prt_health_facilities_points_geojson.zip
+id,Resource ID,8729407c-10bf-4148-98fe-0386d239c1a4
+last_modified,Updated,2025-05-01T18:30:09.434322
+metadata_modified,Metadata Updated,2025-05-01T18:32:56.114468
+microdata,Microdata,False
+dataset_id,Dataset ID,bcebeb98-af93-43c9-a3be-25d1f3df095a
+resource_type,Resource Type,api
+name,Resource Name,hotosm_prt_health_facilities_points_geojson.zip
+mimetype,MIME Type,
+size,Size,205.7K
