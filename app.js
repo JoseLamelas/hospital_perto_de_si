@@ -67,11 +67,42 @@ $(document).ready(function() {
                 "accept-language": "pt-PT"
             },
             success: function(resposta) {
-                let endereco = resposta.display_name || "Endereço não encontrado";
-                $("#location-display").text(endereco);
+                var enderecoCompleto = resposta.display_name || "Endereço não encontrado";
+                var enderecoSimplificado = enderecoCompleto;
+
+                // Extrair apenas rua, freguesia e concelho, se disponíveis
+                if (resposta.address) {
+                    var partes = [];
+                    
+                    // Rua e número
+                    if (resposta.address.road) {
+                        var rua = resposta.address.road;
+                        partes.push(rua);
+                    }
+                    
+                    // Freguesia
+                    if (resposta.address.suburb) {
+                        partes.push(resposta.address.suburb);
+                    } else if (resposta.address.neighbourhood) {
+                        partes.push(resposta.address.neighbourhood);
+                    }
+                    
+                    // Concelho
+                    if (resposta.address.city) {
+                        partes.push(resposta.address.city);
+                    } else if (resposta.address.town) {
+                        partes.push(resposta.address.town);
+                    }
+                    
+                    // Se temos partes específicas, use-as
+                    if (partes.length > 0) {
+                        enderecoSimplificado = partes.join(", ");
+                    }
+                }
                 
                 // Atualizar também no cabeçalho da página de resultados, se existir
-                $("#list-location-display").text(endereco);
+                $("#location-display").text(enderecoSimplificado);
+                $("#list-location-display").text(enderecoSimplificado);
                 
                 // Armazenar as coordenadas para uso posterior
                 window.userLatitude = latitude;
