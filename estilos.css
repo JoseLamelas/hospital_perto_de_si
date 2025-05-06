@@ -300,12 +300,37 @@ body {
 }
 
 
-
-
-
 /* Popup Overlay for Frosted Effect */
 .ui-popup-screen.in {
     background-color: rgba(0, 0, 0, 0.4) !important; /* Semi-transparent black overlay */
     -webkit-backdrop-filter: blur(5px) !important; /* Safari */
     backdrop-filter: blur(5px) !important; /* Standard */
+}
+
+/* Estilo específico para o texto de localização */
+#location-display {
+    font-size: 14px; /* Tamanho da fonte para a localização */
+    font-weight: bold; /* Deixa o texto em negrito */
+    margin-top: 5px; /* Espaçamento superior */
+    overflow: hidden; /* Esconde o texto que ultrapassar o limite */
+    text-overflow: ellipsis; /* Adiciona "..." quando o texto for muito longo */
+    max-width: 100%; /* Garante que não ultrapasse o contêiner */
+}
+
+/* Transição suave quando a localização é obtida */
+.localizacao-obtida {
+    color: #2ecc71 !important; /* Cor verde para indicar sucesso */
+    transition: color 0.5s ease-in-out;
+}
+
+/* Ajuste específico para o texto "Onde está" */
+.greeting-text p {
+    font-size: 16px; /* Mantém o tamanho original */
+    /* Outros estilos permanecem inalterados */
+}
+
+/* Ajuste para garantir que o título h1 continue com o tamanho padrão 
+   exceto para o location-display específico */
+.greeting-text h1:not(#location-display) {
+    font-size: 24px; /* Tamanho padrão dos títulos h1 */
 }
