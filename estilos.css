@@ -334,3 +334,259 @@ body {
 .greeting-text h1:not(#location-display) {
     font-size: 24px; /* Tamanho padrão dos títulos h1 */
 }
+
+/* Estilos para a lista de hospitais */
+.hospitals-list-container {
+    padding: 10px 15px;
+    margin-top: 10px;
+}
+
+/* Cabeçalho com botões de menos */
+.hospitals-header {
+    background-color: #5a6183;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.hospitals-header span {
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.hospitals-header .circle-icon {
+    color: white;
+    font-size: 22px;
+}
+
+/* Item individual de hospital */
+.hospital-item {
+    background-color: #e8ebf0;
+    border-radius: 25px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hospital-name {
+    color: #555;
+    font-size: 16px;
+}
+
+/* Botão de adicionar (símbolo +) */
+.add-button {
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5a6183;
+    border: 1px solid #d0d3d6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Botão "mais" */
+.more-button {
+    background-color: #e8ebf0;
+    color: #555;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.more-button span {
+    flex-grow: 1;
+}
+
+.more-button .circle-icon {
+    color: #5a6183;
+    font-size: 18px;
+}
+
+/* Container das listas */
+.hospitals-list-container,
+.pharmacies-list-container {
+    padding: 10px 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+/* Animações de transição */
+.hospitals-list-container,
+.pharmacies-list-container {
+    transition: height 0.3s ease-in-out;
+}
+
+/* Cabeçalho da lista */
+.hospitals-header {
+    background-color: #5a6183;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+/* Ajuste para cabeçalho de farmácias */
+.pharmacies-list-container .hospitals-header {
+    background-color: #6a7095;
+}
+
+.hospitals-header span {
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.hospitals-header .circle-icon {
+    color: white;
+    font-size: 22px;
+}
+
+/* Item individual de instalação */
+.hospital-item {
+    background-color: #e8ebf0;
+    border-radius: 25px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.hospital-item:hover {
+    background-color: #dfe3e9;
+}
+
+.hospital-name {
+    color: #555;
+    font-size: 16px;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Botão de adicionar (símbolo +) */
+.add-button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5a6183;
+    border: 1px solid #d0d3d6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-left: 10px;
+}
+
+.add-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.add-button:active {
+    transform: scale(0.95);
+}
+
+/* Botão "mais" */
+.more-button {
+    background-color: #e8ebf0;
+    color: #555;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.more-button:hover {
+    background-color: #dfe3e9;
+}
+
+.more-button span {
+    flex-grow: 1;
+}
+
+.more-button .circle-icon {
+    color: #5a6183;
+    font-size: 18px;
+}
+
+/* Indicador de distância */
+.distance-indicator {
+    font-size: 14px;
+    color: #777;
+    margin-left: 8px;
+}
+
+/* Efeito de carregamento */
+.loading-animation {
+    text-align: center;
+    padding: 20px;
+    color: #5a6183;
+}
+
+.loading-animation i {
+    animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 480px) {
+    .hospital-name {
+        font-size: 14px;
+    }
+    
+    .hospitals-header span {
+        font-size: 16px;
+    }
+}
+
+/* Estilo para quando nenhuma instalação é encontrada */
+.no-results-message {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 25px;
+    color: #6c757d;
+    margin: 10px 0;
+}
+
+/* Classe para quando a localização é obtida com sucesso */
+.localizacao-obtida {
+    color: #2ecc71 !important;
+    transition: color 0.5s ease-in-out;
+}
