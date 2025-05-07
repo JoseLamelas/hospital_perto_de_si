@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Localizador Saúde</title>
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
 
@@ -28,10 +28,17 @@
     </div><!-- /header -->
 
     <div role="main" class="ui-content">
-        <a href="#user_location" class="ui-btn location-button-custom"> <i class="fas fa-map-marker-alt"></i> LOCALIZAÇÃO <i class="fas fa-bullseye"></i></a>
-        <a href="#" id="hospitals-btn" class="ui-btn option-button-custom hospitals-button-custom"><i class="fas fa-plus-circle"></i> Hospitais <i class="fas fa-plus-circle"></i></a>
-        <a href="#" id="pharmacies-btn" class="ui-btn option-button-custom pharmacies-button-custom"><i class="fas fa-plus-circle"></i> Farmácias <i class="fas fa-plus-circle"></i></a>
-    </div><!-- /content -->
+        <a class="ui-btn location-button-custom"> <i class="fas fa-map-marker-alt"></i> LOCALIZAÇÃO <i class="fas fa-bullseye"></i></a>
+        
+        <!-- Botões em um div separado para isolá-los -->
+        <div class="main-buttons">
+            <a id="hospitals-btn" class="ui-btn option-button-custom hospitals-button-custom"><i class="fas fa-plus-circle"></i> Hospitais <i class="fas fa-plus-circle"></i></a>
+            <a id="pharmacies-btn" class="ui-btn option-button-custom pharmacies-button-custom"><i class="fas fa-plus-circle"></i> Farmácias <i class="fas fa-plus-circle"></i></a>
+        </div>
+        
+        <!-- Container dedicado para listas, completamente separado dos botões -->
+        <div id="facilities-lists-container"></div>
+    </div>
 
     <div data-role="footer" data-position="fixed" class="app-footer">
         <div data-role="navbar">
