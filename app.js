@@ -361,12 +361,14 @@ $(document).ready(function() {
         let listaHTML = `<div id="${containerId}" style="display:none;">`;
         
         // Adicionar cada instalação à lista HTML
-        instalacoesMaisProximas.forEach(feature => {
+        instalacoesMaisProximas.forEach((feature, index) => {
             const nome = feature.properties.name || `${tipo === 'hospital' ? 'Hospital' : 'Farmácia'} sem nome`;
             const distancia = feature.distance.toFixed(1);
+            const coords = feature.geometry.coordinates;
             
+            // Armazenar as coordenadas como atributos data- para uso no evento de clique
             listaHTML += `
-                <div class="hospital-item">
+                <div class="hospital-item" data-lat="${coords[1]}" data-lon="${coords[0]}" data-name="${nome}">
                     <div class="hospital-name">${nome} (${distancia} km)</div>
                     <div class="add-button">
                         <i class="fas fa-plus"></i>
@@ -375,9 +377,8 @@ $(document).ready(function() {
             `;
         });
         
-        // Adicionar botão "mais" no final da lista
-        listaHTML += `
-        </div>`;
+        // Fechar a div do container
+        listaHTML += `</div>`;
         
         // IMPORTANTE: Inserir a lista na posição correta
         if (tipo === 'hospital') {
@@ -391,14 +392,30 @@ $(document).ready(function() {
         // Mostrar com animação
         $(`#${containerId}`).hide().slideDown(500);
         
-        // Adicionar evento ao botão "mais"
-        $('.more-button').on("click", function() {
-            alert(`Carregando mais ${tipo === 'hospital' ? 'hospitais' : 'farmácias'}...`);
+        // Adicionar evento de clique aos itens da lista para abrir o Google Maps
+        $('.hospital-item').on("click", function() {
+            // Obter as coordenadas do destino e o nome
+            const lat = $(this).data('lat');
+            const lon = $(this).data('lon');
+            const nome = $(this).data('name');
+            
+            // Abrir o Google Maps com o trajeto da localização do usuário para o destino
+            if (window.userLatitude && window.userLongitude) {
+                // Construir a URL do Google Maps com os parâmetros para direções
+                const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${window.userLatitude},${window.userLongitude}&destination=${lat},${lon}&travelmode=driving`;
+                
+                // Abrir em uma nova janela/aba
+                window.open(mapsUrl, '_blank');
+            } else {
+                // Se não temos a localização do usuário, abrir apenas a localização do destino
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+                window.open(mapsUrl, '_blank');
+            }
         });
         
         // Adicionar evento aos botões de adicionar aos favoritos
         $('.add-button').on("click", function(e) {
-            e.stopPropagation();
+            e.stopPropagation(); // Impedir que o clique se propague para o item pai
             const nome = $(this).siblings(".hospital-name").text();
             alert(`${nome} adicionado aos favoritos`);
         });
