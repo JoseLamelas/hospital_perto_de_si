@@ -3,7 +3,7 @@ $(document).ready(function() {
     window.currentVisibleSection = null;
     
     // Chave da API do Google Maps - SUBSTITUA PELA SUA CHAVE
-    const apiKey = 'SUA_CHAVE_API_AQUI';
+    const apiKey = 'AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA';
     
     // Verificar se a API do Google Maps está carregada corretamente
     if (typeof google === 'undefined' || !google.maps) {
