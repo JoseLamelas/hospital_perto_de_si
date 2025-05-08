@@ -615,3 +615,61 @@ body {
     font-style: italic;
     opacity: 0.9;
 }
+
+/* Adicione estes estilos ao seu arquivo style.css para melhorar a exibição das informações de trânsito */
+
+/* Contêiner para informações de distância e tempo */
+.distance-time-info {
+    display: block;
+    color: #777;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: normal;
+    line-height: 1.4;
+}
+
+/* Informações específicas de trânsito */
+.traffic-info {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Ícone de carro */
+.traffic-info i.fa-car {
+    color: #4a69bd;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+/* Destaque para atraso no trânsito */
+.traffic-delay {
+    color: #e55039;
+    margin-left: 5px;
+    font-weight: 500;
+}
+
+/* Destaque para trânsito bom */
+.traffic-good {
+    color: #78e08f;
+    margin-left: 5px;
+    font-weight: 500;
+}
+
+/* Ajustes para itens da lista */
+.hospital-item {
+    padding: 15px 20px !important;
+}
+
+.hospital-name {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Nome da instalação em destaque */
+.hospital-name strong {
+    font-size: 16px;
+    color: #2d3436;
+    margin-bottom: 2px;
+}
