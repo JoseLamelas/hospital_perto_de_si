@@ -307,126 +307,78 @@ $(document).ready(function() {
         });
     }
     
-    // FUNÇÃO DE DEPURAÇÃO: Calcular distância e tempo usando Google Distance Matrix API
-    function calcularDistanciaETempoGoogle(originLat, originLng, destLat, destLng) {
-        return new Promise((resolve, reject) => {
-            console.log(`Calculando rota de [${originLat}, ${originLng}] para [${destLat}, ${destLng}]`);
+    // Função simplificada para calcular distância e tempo usando Google Distance Matrix API
+function calcularDistanciaETempoGoogle(originLat, originLng, destLat, destLng) {
+    return new Promise((resolve, reject) => {
+        // Se a API do Google Maps não estiver disponível, usar o cálculo de Haversine
+        if (typeof google === 'undefined' || !google.maps || !google.maps.DistanceMatrixService) {
+            console.warn('API do Google Maps não disponível, usando cálculo simples.');
+            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
+            const tempoEstimadoMin = Math.round(distanciaKm * 2); 
             
-            // Se a API do Google Maps não estiver disponível, usar o cálculo de Haversine
-            if (typeof google === 'undefined' || !google.maps || !google.maps.DistanceMatrixService) {
-                console.warn('API do Google Maps não disponível, usando cálculo simples.');
-                const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                // Estimativa simples: considerar velocidade média de 30km/h
-                const tempoEstimadoMin = Math.round(distanciaKm * 2); // 2 minutos por km (velocidade 30km/h)
-                
-                const resultado = {
-                    distancia: distanciaKm,
-                    distanciaTexto: distanciaKm.toFixed(1) + " km",
-                    duracao: tempoEstimadoMin,
-                    duracaoTexto: tempoEstimadoMin + " min",
-                    usandoApiFallback: true
-                };
-                
-                console.log("Resultado (fallback):", resultado);
-                resolve(resultado);
-                return;
-            }
+            resolve({
+                distancia: distanciaKm,
+                distanciaTexto: distanciaKm.toFixed(1) + " km",
+                duracao: tempoEstimadoMin,
+                duracaoTexto: tempoEstimadoMin + " min",
+                usandoApiFallback: true
+            });
+            return;
+        }
+        
+        try {
+            // Criar o serviço Distance Matrix
+            const service = new google.maps.DistanceMatrixService();
             
-            try {
-                // Configurar origem e destino
-                const origin = new google.maps.LatLng(originLat, originLng);
-                const destination = new google.maps.LatLng(destLat, destLng);
-                
-                // Criar o serviço Distance Matrix
-                const service = new google.maps.DistanceMatrixService();
-                console.log("Serviço Distance Matrix criado");
-                
-                // Configurar os parâmetros da requisição
-                const request = {
-                    origins: [origin],
-                    destinations: [destination],
-                    travelMode: google.maps.TravelMode.DRIVING, // Modo de viagem (DRIVING, WALKING, etc.)
-                    unitSystem: google.maps.UnitSystem.METRIC,
-                    avoidHighways: false,
-                    avoidTolls: false
-                };
-                
-                console.log("Enviando requisição à API Distance Matrix");
-                
-                // Fazer a requisição à API
-                service.getDistanceMatrix(request, function(response, status) {
-                    console.log("Status da resposta Distance Matrix:", status);
-                    console.log("Resposta completa:", JSON.stringify(response, null, 2));
+            // Configurar os parâmetros da requisição
+            service.getDistanceMatrix({
+                origins: [{lat: originLat, lng: originLng}],
+                destinations: [{lat: destLat, lng: destLng}],
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC
+            }, callback);
+            
+            function callback(response, status) {
+                if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
+                    const distancia = response.rows[0].elements[0].distance;
+                    const duracao = response.rows[0].elements[0].duration;
                     
-                    if (status === google.maps.DistanceMatrixStatus.OK) {
-                        if (response.rows[0].elements[0].status === google.maps.DistanceMatrixElementStatus.OK) {
-                            const distancia = response.rows[0].elements[0].distance;
-                            const duracao = response.rows[0].elements[0].duration;
-                            
-                            const resultado = {
-                                distancia: distancia.value / 1000, // Converter metros para km
-                                distanciaTexto: distancia.text,
-                                duracao: Math.round(duracao.value / 60), // Converter segundos para minutos
-                                duracaoTexto: duracao.text
-                            };
-                            
-                            console.log("Resultado calculado com sucesso:", resultado);
-                            resolve(resultado);
-                        } else {
-                            console.warn("Não foi possível calcular a rota:", response.rows[0].elements[0].status);
-                            // Fallback para cálculo de Haversine se não for possível calcular a rota
-                            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                            const tempoEstimadoMin = Math.round(distanciaKm * 2); // estimativa aproximada
-                            
-                            const resultado = {
-                                distancia: distanciaKm,
-                                distanciaTexto: distanciaKm.toFixed(1) + " km",
-                                duracao: tempoEstimadoMin, 
-                                duracaoTexto: tempoEstimadoMin + " min",
-                                usandoApiFallback: true
-                            };
-                            
-                            console.log("Resultado (fallback após erro de rota):", resultado);
-                            resolve(resultado);
-                        }
-                    } else {
-                        console.error('Erro na Distance Matrix API:', status);
-                        // Fallback para cálculo simples em caso de erro
-                        const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                        const tempoEstimadoMin = Math.round(distanciaKm * 2);
-                        
-                        const resultado = {
-                            distancia: distanciaKm,
-                            distanciaTexto: distanciaKm.toFixed(1) + " km",
-                            duracao: tempoEstimadoMin,
-                            duracaoTexto: tempoEstimadoMin + " min",
-                            usandoApiFallback: true
-                        };
-                        
-                        console.log("Resultado (fallback após erro de API):", resultado);
-                        resolve(resultado);
-                    }
-                });
-            } catch (error) {
-                console.error("Erro ao executar Distance Matrix API:", error);
-                // Fallback para cálculo simples em caso de exceção
-                const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                const tempoEstimadoMin = Math.round(distanciaKm * 2);
-                
-                const resultado = {
-                    distancia: distanciaKm,
-                    distanciaTexto: distanciaKm.toFixed(1) + " km",
-                    duracao: tempoEstimadoMin,
-                    duracaoTexto: tempoEstimadoMin + " min",
-                    usandoApiFallback: true,
-                    erro: error.message
-                };
-                
-                console.log("Resultado (fallback após exceção):", resultado);
-                resolve(resultado);
+                    resolve({
+                        distancia: distancia.value / 1000, // metros para km
+                        distanciaTexto: distancia.text,
+                        duracao: Math.round(duracao.value / 60), // segundos para minutos
+                        duracaoTexto: duracao.text
+                    });
+                } else {
+                    console.warn('Não foi possível calcular rota via API, usando cálculo simples.');
+                    const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
+                    const tempoEstimadoMin = Math.round(distanciaKm * 2);
+                    
+                    resolve({
+                        distancia: distanciaKm,
+                        distanciaTexto: distanciaKm.toFixed(1) + " km",
+                        duracao: tempoEstimadoMin,
+                        duracaoTexto: tempoEstimadoMin + " min",
+                        usandoApiFallback: true
+                    });
+                }
             }
-        });
-    }
+        } catch (error) {
+            console.error('Erro ao usar Distance Matrix API:', error);
+            // Fallback para cálculo simples
+            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
+            const tempoEstimadoMin = Math.round(distanciaKm * 2);
+            
+            resolve({
+                distancia: distanciaKm,
+                distanciaTexto: distanciaKm.toFixed(1) + " km",
+                duracao: tempoEstimadoMin,
+                duracaoTexto: tempoEstimadoMin + " min",
+                usandoApiFallback: true
+            });
+        }
+    });
+}
     
     // Mantemos a função original como fallback e renomeamos para ser mais específica
     function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
