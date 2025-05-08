@@ -491,11 +491,21 @@ function calcularDistanciaETempoGoogle(originLat, originLng, destLat, destLng) {
             const resultados = await Promise.all(promessas);
             console.log("Todos os cálculos foram concluídos!");
             
-            // Ordenar por tempo (ou distância se o tempo não estiver disponível)
+            // Ordenar prioritariamente pelo tempo de viagem considerando o trânsito
             resultados.sort((a, b) => {
+                // Se ambos têm duração, ordenar por tempo
                 if (a.duration && b.duration) {
                     return a.duration - b.duration;
-                } else {
+                } 
+                // Se apenas um tem duração, priorizar ele
+                else if (a.duration && !b.duration) {
+                    return -1;
+                }
+                else if (!a.duration && b.duration) {
+                    return 1;
+                }
+                // Caso ambos não tenham duração, usar distância
+                else {
                     return a.distance - b.distance;
                 }
             });
