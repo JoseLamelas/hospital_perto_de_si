@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- IMPORTANTE: Carrega a API do Google Maps ANTES de jQuery Mobile para evitar conflitos -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_API_AQUI&libraries=places,geometry"></script>
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <!-- Adicionar a API do Google Maps com sua chave -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA&libraries=places"></script>
     <script src="script.js"></script>
 </head>
 <body>
@@ -158,6 +158,30 @@
 
 </div><!-- /page -->
 
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93bbc1f879f9675e',t:'MTc0NjU2ODkwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<!-- Para debug: Mostra mensagens de erro da API do Google Maps -->
+<div id="debug-panel" style="position: fixed; bottom: 70px; left: 0; right: 0; z-index: 9999; background: rgba(255,255,255,0.9); padding: 5px; font-size: 12px; display: none; max-height: 150px; overflow-y: auto;">
+    <div id="debug-content"></div>
+    <button id="close-debug" style="padding: 2px 5px; font-size: 10px; margin-top: 5px;">Fechar</button>
+</div>
+
+<script>
+// Script para debug
+$(document).ready(function() {
+    // Verificar se a API do Google está carregada
+    if (typeof google === 'undefined') {
+        $('#debug-panel').show();
+        $('#debug-content').append('<p style="color:red">ERRO: API do Google Maps não carregada!</p>');
+    } else {
+        $('#debug-content').append('<p style="color:green">API do Google Maps carregada com sucesso.</p>');
+        // Mostrar por 2 segundos e depois esconder
+        $('#debug-panel').show().delay(2000).fadeOut();
+    }
+    
+    $('#close-debug').on('click', function() {
+        $('#debug-panel').hide();
+    });
+});
+</script>
+
 </body>
 </html>
