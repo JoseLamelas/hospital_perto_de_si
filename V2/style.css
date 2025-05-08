@@ -1,0 +1,617 @@
+/* Global App Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-header {
+    background: linear-gradient(to right, #43cea2, #185a9d) !important;
+    color: white !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+}
+
+.app-header .header-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    padding: 5px 15px;
+    background-color: rgba(0,0,0,0.1); /* Slight transparency for status bar area */
+}
+
+.app-header .header-main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px 15px 15px;
+}
+
+.app-header .greeting-text p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+.app-header .greeting-text h1 {
+    margin: 0;
+    font-size: 24px; /* Adjusted from previous static version */
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.app-header .app-logo img {
+    width: 45px;
+    height: 45px;
+}
+
+/* jQuery Mobile Overrides for Header */
+.app-header.ui-header-fixed {
+    padding-top: 0;
+}
+
+.app-header .ui-title {
+    margin: 0.6em 15% 0.8em !important; /* Adjust if title is used */
+}
+
+/* Custom Button Styles */
+.location-button-custom {
+    background: linear-gradient(to right, #6a7095, #f07259) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    text-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 20px auto !important;
+    width: calc(100% - 40px);
+    max-width: 350px;
+}
+
+.option-button-custom {
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    text-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 auto 15px auto !important;
+    width: calc(100% - 40px);
+    max-width: 350px;
+}
+
+.option-button-custom i {
+    font-size: 20px;
+}
+
+.hospitals-button-custom {
+    background-color: #545F71 !important;
+    color: white !important;
+}
+
+.hospitals-button-custom i {
+    color: white !important;
+}
+
+.pharmacies-button-custom {
+    background-color: #9BA5B7 !important;
+    color: white !important;
+}
+
+
+
+/* Footer Styles */
+.app-footer .ui-navbar ul {
+    display: flex;
+    justify-content: space-around;
+}
+
+.app-footer .ui-navbar li a {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    border-top: 3px solid transparent !important;
+}
+
+.app-footer .ui-navbar li a.ui-btn-active {
+    border-top-color: #2ecc71 !important; /* Green indicator for active tab */
+    background-color: white !important;
+    color: #2ecc71 !important;
+}
+
+.app-footer .ui-icon-home:after {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M10%2020v-6h4v6h5v-8h3L12%203%202%2012h3v8z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
+}
+.app-footer .ui-icon-heart:after {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%2021.35l-1.45-1.32C5.4%2015.36%202%2012.28%202%208.5%202%205.42%204.42%203%207.5%203c1.74%200%203.41.81%204.5%202.09C13.09%203.81%2014.76%203%2016.5%203%2019.58%203%2022%205.42%2022%208.5c0%203.78-3.4%206.86-8.55%2011.54L12%2021.35z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
+}
+.app-footer .ui-icon-book:after {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M18%202H6c-1.1%200-2%20.9-2%202v16c0%201.1.9%202%202%202h12c1.1%200%202-.9%202-2V4c0-1.1-.9-2-2-2zM6%204h5v8l-2.5-1.5L6%2012V4z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
+}
+.app-footer .ui-icon-comment:after {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M20%202H4c-1.1%200-2%20.9-2%202v18l4-4h14c1.1%200%202-.9%202-2V4c0-1.1-.9-2-2-2zm-2%2012H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
+}
+
+.app-footer .ui-btn-active .ui-icon-home:after {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M10%2020v-6h4v6h5v-8h3L12%203%202%2012h3v8z%22%20fill%3D%22%232ecc71%22%2F%3E%3C%2Fsvg%3E") !important;
+}
+
+/* Location Choice Popup */
+#location-choice-popup {
+    text-align: center;
+}
+#location-choice-popup .ui-content {
+    padding: 20px;
+}
+.location-action-btn.ui-btn-b {
+    background-color: #2ecc71 !important; /* Green button */
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+}
+.location-action-btn.ui-btn-c {
+    background-color: white !important;
+    color: #2ecc71 !important; /* Green text */
+    border: 1px solid #2ecc71 !important; /* Green border */
+    border-radius: 8px !important;
+}
+
+
+/* List Results Page */
+.filter-buttons-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.filter-btn-custom {
+    border-radius: 20px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    text-shadow: none !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin: 0 5px !important;
+    flex-grow: 1;
+}
+
+.filter-btn-custom i {
+    margin-right: 5px;
+}
+
+.emergency-filter-btn {
+    background-color: #ff6b6b !important;
+    color: white !important;
+}
+
+.general-filter-btn {
+    background-color: #20c997 !important;
+    color: white !important;
+}
+
+.pediatric-filter-btn {
+    background-color: #a9d8c8 !important;
+    color: #333 !important;
+}
+
+.filter-btn-custom.active {
+    /* Add styles for active filter button if needed, e.g., darker shade */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.list-header-button-custom {
+    background-color: #5a6183 !important;
+    color: white !important;
+    margin-bottom: 10px !important;
+}
+
+.list-header-button-custom i {
+    color: white !important;
+}
+
+#results-list .ui-li-static {
+    background-color: #e8ebf0 !important;
+    color: #333 !important;
+    border: 1px solid #d0d3d6 !important;
+    border-radius: 25px !important;
+    padding: 12px 20px !important;
+    font-size: 15px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 10px !important; /* Spacing between items */
+}
+
+#results-list .ui-li-static i {
+    font-size: 18px;
+    color: #555;
+}
+
+.more-button-custom {
+    background-color: #e8ebf0 !important;
+    color: #555 !important;
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+}
+
+.toggle-list-button-custom {
+    background-color: #adb5bd !important;
+    color: white !important;
+}
+
+.toggle-list-button-custom i {
+    color: white !important;
+}
+
+/* Utility for hiding elements */
+.hidden {
+    display: none !important;
+}
+
+/* Adjustments for fixed header/footer content overlap */
+.ui-header-fixed, .ui-footer-fixed {
+    z-index: 1000 !important;
+}
+
+#home-page .ui-content, 
+#list-results-page .ui-content {
+    padding-top: 80px; /* Adjust based on actual header height */
+    padding-bottom: 60px; /* Adjust based on actual footer height */
+}
+
+#manual-address-page .ui-content {
+     padding-top: 100px; /* Adjust based on actual header height */
+     padding-bottom: 60px;
+}
+
+/* Ensure popups are above other content */
+.ui-popup-container {
+    z-index: 1100 !important; 
+}
+.ui-popup {
+    z-index: 1101 !important;
+}
+
+
+/* Popup Overlay for Frosted Effect 
+.ui-popup-screen.in {
+    background-color: rgba(0, 0, 0, 0.4) !important; /* Semi-transparent black overlay 
+    -webkit-backdrop-filter: blur(5px); 
+    backdrop-filter: blur(5px) !important; 
+}*/
+
+/* Estilo específico para o texto de localização */
+#location-display {
+    font-size: 14px; /* Tamanho da fonte para a localização */
+    margin-top: 5px; /* Espaçamento superior */
+    overflow: hidden; /* Esconde o texto que ultrapassar o limite */
+    text-overflow: ellipsis; /* Adiciona "..." quando o texto for muito longo */
+    max-width: 100%; /* Garante que não ultrapasse o contêiner */
+}
+
+
+/* Transição suave quando a localização é obtida */
+.localizacao-obtida {
+    transition: color 0.5s ease-in-out;
+}
+
+/* Ajuste específico para o texto "Onde está" */
+.greeting-text p {
+    font-size: 16px; /* Mantém o tamanho original */
+    /* Outros estilos permanecem inalterados */
+}
+
+/* Ajuste para garantir que o título h1 continue com o tamanho padrão 
+   exceto para o location-display específico */
+.greeting-text h1:not(#location-display) {
+    font-size: 24px; /* Tamanho padrão dos títulos h1 */
+}
+
+/* Estilos para a lista de hospitais */
+.hospitals-list-container, 
+.pharmacies-list-container {
+    padding: 10px 15px;
+    margin-top: 10px;
+}
+
+/* Cabeçalho com botões de menos */
+.hospitals-header {
+    background-color: #5a6183;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.hospitals-header span {
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.hospitals-header .circle-icon {
+    color: white;
+    font-size: 22px;
+}
+
+/* Item individual de hospital */
+.hospital-item {
+    background-color: #e8ebf0;
+    border-radius: 25px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hospital-name {
+    color: #555;
+    font-size: 16px;
+    flex-grow: 1;
+}
+
+/* NOVO: Estilo para informações de distância e tempo */
+.distance-time-info {
+    display: block;
+    color: #777;
+    font-size: 14px;
+    margin-top: 3px;
+    font-weight: normal;
+}
+
+/* Botão de adicionar (símbolo +) */
+.add-button {
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5a6183;
+    border: 1px solid #d0d3d6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Botão "mais" */
+.more-button {
+    background-color: #e8ebf0;
+    color: #555;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.more-button span {
+    flex-grow: 1;
+}
+
+.more-button .circle-icon {
+    color: #5a6183;
+    font-size: 18px;
+}
+
+/* Container das listas */
+.hospitals-list-container,
+.pharmacies-list-container {
+    padding: 10px 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+/* Animações de transição */
+.hospitals-list-container,
+.pharmacies-list-container {
+    transition: height 0.3s ease-in-out;
+}
+
+/* Cabeçalho da lista */
+.hospitals-header {
+    background-color: #5a6183;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+/* Ajuste para cabeçalho de farmácias */
+.pharmacies-list-container .hospitals-header {
+    background-color: #9BA5B7;
+}
+
+.hospitals-header span {
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.hospitals-header .circle-icon {
+    color: white;
+    font-size: 22px;
+}
+
+/* Item individual de instalação */
+.hospital-item {
+    background-color: #e8ebf0;
+    border-radius: 25px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.hospital-item:hover {
+    background-color: #dfe3e9;
+}
+
+.hospital-name {
+    color: #555;
+    font-size: 16px;
+    flex-grow: 1;
+    white-space: normal; /* Permitir quebra de linha para acomodar informações de distância/tempo */
+    overflow: hidden;
+}
+
+/* Botão de adicionar (símbolo +) */
+.add-button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5a6183;
+    border: 1px solid #d0d3d6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-left: 10px;
+}
+
+.add-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.add-button:active {
+    transform: scale(0.95);
+}
+
+/* Botão "mais" */
+.more-button {
+    background-color: #e8ebf0;
+    color: #555;
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.more-button:hover {
+    background-color: #dfe3e9;
+}
+
+.more-button span {
+    flex-grow: 1;
+}
+
+.more-button .circle-icon {
+    color: #5a6183;
+    font-size: 18px;
+}
+
+/* Indicador de distância e tempo */
+.distance-time-info {
+    display: block;
+    color: #777;
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: normal;
+}
+
+/* Animação de carregamento enquanto calcula distâncias */
+.loading-animation {
+    text-align: center;
+    padding: 20px;
+    color: #5a6183;
+    font-size: 16px;
+}
+
+.loading-animation i {
+    animation: spin 1.5s infinite linear;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mensagem de erro */
+.error-message {
+    text-align: center;
+    padding: 15px;
+    background-color: #ffe5e5;
+    border-radius: 25px;
+    color: #d63031;
+    margin: 10px 0;
+    border: 1px solid #fab1a0;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 480px) {
+    .hospital-name {
+        font-size: 14px;
+    }
+    
+    .hospitals-header span {
+        font-size: 16px;
+    }
+    
+    .distance-time-info {
+        font-size: 12px;
+    }
+}
+
+/* Estilo para quando nenhuma instalação é encontrada */
+.no-results-message {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 25px;
+    color: #6c757d;
+    margin: 10px 0;
+}
+
+/* Classe para quando a localização é obtida com sucesso */
+.localizacao-obtida {
+    color: #ffffff !important;
+    transition: color 0.5s; 
+}
+
+/* Destaque para tempo real de trânsito */
+.real-traffic-info {
+    color: #2d3436;
+    font-weight: 500;
+}
+
+/* Ícone de carro para indicar tempo de condução */
+.travel-mode-icon {
+    margin-right: 4px;
+    color: #636e72;
+}
+
+/* Distância em linha reta (quando fallback é usado) */
+.approx-distance {
+    font-style: italic;
+    opacity: 0.9;
+}
