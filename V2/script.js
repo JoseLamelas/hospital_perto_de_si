@@ -2,6 +2,9 @@ $(document).ready(function() {
     // Estado global para controlar o que está atualmente visível
     window.currentVisibleSection = null;
     
+    // Chave da API do Google Maps - SUBSTITUA PELA SUA CHAVE
+    const apiKey = 'SUA_CHAVE_API_AQUI';
+    
     // Verificar se a API do Google Maps está carregada corretamente
     if (typeof google === 'undefined' || !google.maps) {
         console.error("ERRO: API do Google Maps não foi carregada corretamente!");
@@ -304,107 +307,123 @@ $(document).ready(function() {
         });
     }
     
-    // Função para calcular distância e tempo usando Google Distance Matrix API com TRÂNSITO EM TEMPO REAL
+    // FUNÇÃO DE DEPURAÇÃO: Calcular distância e tempo usando Google Distance Matrix API
     function calcularDistanciaETempoGoogle(originLat, originLng, destLat, destLng) {
         return new Promise((resolve, reject) => {
+            console.log(`Calculando rota de [${originLat}, ${originLng}] para [${destLat}, ${destLng}]`);
+            
             // Se a API do Google Maps não estiver disponível, usar o cálculo de Haversine
             if (typeof google === 'undefined' || !google.maps || !google.maps.DistanceMatrixService) {
                 console.warn('API do Google Maps não disponível, usando cálculo simples.');
                 const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                const tempoEstimadoMin = Math.round(distanciaKm * 2); 
+                // Estimativa simples: considerar velocidade média de 30km/h
+                const tempoEstimadoMin = Math.round(distanciaKm * 2); // 2 minutos por km (velocidade 30km/h)
                 
-                resolve({
+                const resultado = {
                     distancia: distanciaKm,
                     distanciaTexto: distanciaKm.toFixed(1) + " km",
                     duracao: tempoEstimadoMin,
                     duracaoTexto: tempoEstimadoMin + " min",
                     usandoApiFallback: true
-                });
+                };
+                
+                console.log("Resultado (fallback):", resultado);
+                resolve(resultado);
                 return;
             }
             
             try {
+                // Configurar origem e destino
+                const origin = new google.maps.LatLng(originLat, originLng);
+                const destination = new google.maps.LatLng(destLat, destLng);
+                
                 // Criar o serviço Distance Matrix
                 const service = new google.maps.DistanceMatrixService();
+                console.log("Serviço Distance Matrix criado");
                 
-                // Definir horário atual para considerar o trânsito em tempo real
-                const now = new Date();
-                
-                // Configurar os parâmetros da requisição com informações de trânsito
-                service.getDistanceMatrix({
-                    origins: [{lat: originLat, lng: originLng}],
-                    destinations: [{lat: destLat, lng: destLng}],
-                    travelMode: google.maps.TravelMode.DRIVING,
+                // Configurar os parâmetros da requisição
+                const request = {
+                    origins: [origin],
+                    destinations: [destination],
+                    travelMode: google.maps.TravelMode.DRIVING, // Modo de viagem (DRIVING, WALKING, etc.)
                     unitSystem: google.maps.UnitSystem.METRIC,
-                    drivingOptions: {
-                        departureTime: now,
-                        trafficModel: google.maps.TrafficModel.BEST_GUESS // BEST_GUESS, OPTIMISTIC, PESSIMISTIC
-                    }
-                }, callback);
+                    avoidHighways: false,
+                    avoidTolls: false
+                };
                 
-                function callback(response, status) {
-                    console.log("Status da API:", status);
+                console.log("Enviando requisição à API Distance Matrix");
+                
+                // Fazer a requisição à API
+                service.getDistanceMatrix(request, function(response, status) {
+                    console.log("Status da resposta Distance Matrix:", status);
+                    console.log("Resposta completa:", JSON.stringify(response, null, 2));
                     
-                    if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
-                        const distancia = response.rows[0].elements[0].distance;
-                        const duracao = response.rows[0].elements[0].duration;
-                        const duracaoNoTransito = response.rows[0].elements[0].duration_in_traffic;
-                        
-                        console.log("Duração normal:", duracao);
-                        console.log("Duração com trânsito:", duracaoNoTransito);
-                        
-                        let resultado;
-                        
-                        // Verificar se temos informações de trânsito
-                        if (duracaoNoTransito) {
-                            resultado = {
-                                distancia: distancia.value / 1000, // metros para km
+                    if (status === google.maps.DistanceMatrixStatus.OK) {
+                        if (response.rows[0].elements[0].status === google.maps.DistanceMatrixElementStatus.OK) {
+                            const distancia = response.rows[0].elements[0].distance;
+                            const duracao = response.rows[0].elements[0].duration;
+                            
+                            const resultado = {
+                                distancia: distancia.value / 1000, // Converter metros para km
                                 distanciaTexto: distancia.text,
-                                duracao: Math.round(duracaoNoTransito.value / 60), // segundos para minutos
-                                duracaoTexto: duracaoNoTransito.text,
-                                duracaoSemTransito: Math.round(duracao.value / 60),
-                                duracaoSemTransitoTexto: duracao.text,
-                                comInfoTransito: true
+                                duracao: Math.round(duracao.value / 60), // Converter segundos para minutos
+                                duracaoTexto: duracao.text
                             };
+                            
+                            console.log("Resultado calculado com sucesso:", resultado);
+                            resolve(resultado);
                         } else {
-                            resultado = {
-                                distancia: distancia.value / 1000, // metros para km
-                                distanciaTexto: distancia.text,
-                                duracao: Math.round(duracao.value / 60), // segundos para minutos
-                                duracaoTexto: duracao.text,
-                                comInfoTransito: false
+                            console.warn("Não foi possível calcular a rota:", response.rows[0].elements[0].status);
+                            // Fallback para cálculo de Haversine se não for possível calcular a rota
+                            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
+                            const tempoEstimadoMin = Math.round(distanciaKm * 2); // estimativa aproximada
+                            
+                            const resultado = {
+                                distancia: distanciaKm,
+                                distanciaTexto: distanciaKm.toFixed(1) + " km",
+                                duracao: tempoEstimadoMin, 
+                                duracaoTexto: tempoEstimadoMin + " min",
+                                usandoApiFallback: true
                             };
+                            
+                            console.log("Resultado (fallback após erro de rota):", resultado);
+                            resolve(resultado);
                         }
-                        
-                        console.log("Resultado do cálculo:", resultado);
-                        resolve(resultado);
                     } else {
-                        console.warn('Não foi possível calcular rota via API, usando cálculo simples. Status:', status);
+                        console.error('Erro na Distance Matrix API:', status);
+                        // Fallback para cálculo simples em caso de erro
                         const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
                         const tempoEstimadoMin = Math.round(distanciaKm * 2);
                         
-                        resolve({
+                        const resultado = {
                             distancia: distanciaKm,
                             distanciaTexto: distanciaKm.toFixed(1) + " km",
                             duracao: tempoEstimadoMin,
                             duracaoTexto: tempoEstimadoMin + " min",
                             usandoApiFallback: true
-                        });
+                        };
+                        
+                        console.log("Resultado (fallback após erro de API):", resultado);
+                        resolve(resultado);
                     }
-                }
+                });
             } catch (error) {
-                console.error('Erro ao usar Distance Matrix API:', error);
-                // Fallback para cálculo simples
+                console.error("Erro ao executar Distance Matrix API:", error);
+                // Fallback para cálculo simples em caso de exceção
                 const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
                 const tempoEstimadoMin = Math.round(distanciaKm * 2);
                 
-                resolve({
+                const resultado = {
                     distancia: distanciaKm,
                     distanciaTexto: distanciaKm.toFixed(1) + " km",
                     duracao: tempoEstimadoMin,
                     duracaoTexto: tempoEstimadoMin + " min",
-                    usandoApiFallback: true
-                });
+                    usandoApiFallback: true,
+                    erro: error.message
+                };
+                
+                console.log("Resultado (fallback após exceção):", resultado);
+                resolve(resultado);
             }
         });
     }
@@ -509,14 +528,6 @@ $(document).ready(function() {
                     feature.duration = resultado.duracao;
                     feature.durationText = resultado.duracaoTexto;
                     feature.usedFallback = resultado.usandoApiFallback || false;
-                    feature.hasTrafficInfo = resultado.comInfoTransito || false;
-                    
-                    // Informações adicionais se tivermos dados de trânsito
-                    if (resultado.comInfoTransito) {
-                        feature.durationWithoutTraffic = resultado.duracaoSemTransito;
-                        feature.durationWithoutTrafficText = resultado.duracaoSemTransitoTexto;
-                    }
-                    
                     return feature;
                 })
             );
@@ -528,21 +539,11 @@ $(document).ready(function() {
             const resultados = await Promise.all(promessas);
             console.log("Todos os cálculos foram concluídos!");
             
-            // Ordenar prioritariamente pelo tempo de viagem considerando o trânsito
+            // Ordenar por tempo (ou distância se o tempo não estiver disponível)
             resultados.sort((a, b) => {
-                // Se ambos têm duração, ordenar por tempo
                 if (a.duration && b.duration) {
                     return a.duration - b.duration;
-                } 
-                // Se apenas um tem duração, priorizar ele
-                else if (a.duration && !b.duration) {
-                    return -1;
-                }
-                else if (!a.duration && b.duration) {
-                    return 1;
-                }
-                // Caso ambos não tenham duração, usar distância
-                else {
+                } else {
                     return a.distance - b.distance;
                 }
             });
@@ -565,57 +566,16 @@ $(document).ready(function() {
                 
                 // Texto para mostrar distância e tempo
                 let infoTexto;
-                
                 if (feature.usedFallback) {
-                    // Se estamos usando fallback (cálculo simplificado)
-                    infoTexto = `
-                        <div>${feature.distanceText} (aprox. ${feature.durationText})</div>
-                    `;
-                } else if (feature.hasTrafficInfo) {
-                    // Se temos informações de trânsito
-                    const tempoExtra = feature.duration - feature.durationWithoutTraffic;
-                    
-                    if (tempoExtra > 5) {
-                        // Se o trânsito adiciona mais de 5 minutos, destacar isso
-                        infoTexto = `
-                            <div>${feature.distanceText}</div>
-                            <div class="traffic-info">
-                                <i class="fas fa-car"></i> ${feature.durationText} 
-                                <span class="traffic-delay">(+${tempoExtra} min devido ao trânsito)</span>
-                            </div>
-                        `;
-                    } else if (tempoExtra > 0) {
-                        // Trânsito tem algum impacto, mas não significativo
-                        infoTexto = `
-                            <div>${feature.distanceText}</div>
-                            <div class="traffic-info">
-                                <i class="fas fa-car"></i> ${feature.durationText}
-                            </div>
-                        `;
-                    } else {
-                        // Trânsito fluido
-                        infoTexto = `
-                            <div>${feature.distanceText}</div>
-                            <div class="traffic-info">
-                                <i class="fas fa-car"></i> ${feature.durationText} 
-                                <span class="traffic-good">(trânsito fluido)</span>
-                            </div>
-                        `;
-                    }
+                    infoTexto = `${feature.distanceText} (aprox. ${feature.durationText})`;
                 } else {
-                    // Sem informações de trânsito, mas usando API
-                    infoTexto = `
-                        <div>${feature.distanceText} (${feature.durationText})</div>
-                    `;
+                    infoTexto = `${feature.distanceText} (${feature.durationText})`;
                 }
                 
                 // Armazenar as coordenadas como atributos data- para uso no evento de clique
                 const itemHTML = `
                     <div class="hospital-item" data-lat="${coords[1]}" data-lon="${coords[0]}" data-name="${nome}">
-                        <div class="hospital-name">
-                            <strong>${nome}</strong> 
-                            <span class="distance-time-info">${infoTexto}</span>
-                        </div>
+                        <div class="hospital-name">${nome} <span class="distance-time-info">${infoTexto}</span></div>
                         <div class="add-button">
                             <i class="fas fa-plus"></i>
                         </div>
@@ -651,7 +611,7 @@ $(document).ready(function() {
             // Adicionar evento aos botões de adicionar aos favoritos
             $('.add-button').on("click", function(e) {
                 e.stopPropagation(); // Impedir que o clique se propague para o item pai
-                const nome = $(this).siblings(".hospital-name").find("strong").text().trim();
+                const nome = $(this).siblings(".hospital-name").text();
                 alert(`${nome} adicionado aos favoritos`);
             });
             
@@ -660,6 +620,4 @@ $(document).ready(function() {
             $(`#${containerId}`).html(`<div class="error-message">Erro ao calcular distâncias e tempos: ${erro.message}. Por favor, tente novamente.</div>`);
         }
     }
-});properties.healthcare === 'hospital';
-                } else if (tipo === 'pharmacy') {
-                    return feature.properties.amenity === 'pharmacy' || feature.
+});
