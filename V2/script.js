@@ -3,7 +3,15 @@ $(document).ready(function() {
     window.currentVisibleSection = null;
     
     // Chave da API do Google Maps - SUBSTITUA PELA SUA CHAVE
-    const apiKey = 'AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA';
+    const apiKey = 'SUA_CHAVE_API_AQUI';
+    
+    // Verificar se a API do Google Maps está carregada corretamente
+    if (typeof google === 'undefined' || !google.maps) {
+        console.error("ERRO: API do Google Maps não foi carregada corretamente!");
+        alert("A API do Google Maps não foi carregada. Verifique sua conexão com a internet e sua chave de API.");
+    } else {
+        console.log("API do Google Maps carregada com sucesso!");
+    }
     
     // Carregar o arquivo GeoJSON assim que a página carregar
     let healthFacilities = [];
@@ -182,6 +190,8 @@ $(document).ready(function() {
                     let latitude = posicao.coords.latitude;
                     let longitude = posicao.coords.longitude;
                     
+                    console.log("Localização obtida com sucesso:", latitude, longitude);
+                    
                     // Armazenar as coordenadas para uso posterior
                     window.userLatitude = latitude;
                     window.userLongitude = longitude;
@@ -212,6 +222,7 @@ $(document).ready(function() {
                             mensagemErro = "Erro desconhecido.";
                     }
                     
+                    console.error("Erro ao obter localização:", mensagemErro);
                     $("#location-display").text(mensagemErro);
                     alert("Não foi possível obter sua localização: " + mensagemErro);
                 },
@@ -283,104 +294,144 @@ $(document).ready(function() {
                     }
                 }
                 
+                console.log("Endereço obtido:", enderecoSimplificado);
+                
                 // Atualizar o texto de localização
                 $("#location-display").text(enderecoSimplificado).addClass('localizacao-obtida');
                 $("#list-location-display").text(enderecoSimplificado);
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error("Erro ao obter endereço:", error);
                 $("#location-display").text("Não foi possível obter o endereço");
             }
         });
     }
     
-    // NOVA FUNÇÃO: Calcular distância e tempo usando Google Distance Matrix API
+    // FUNÇÃO DE DEPURAÇÃO: Calcular distância e tempo usando Google Distance Matrix API
     function calcularDistanciaETempoGoogle(originLat, originLng, destLat, destLng) {
         return new Promise((resolve, reject) => {
+            console.log(`Calculando rota de [${originLat}, ${originLng}] para [${destLat}, ${destLng}]`);
+            
             // Se a API do Google Maps não estiver disponível, usar o cálculo de Haversine
             if (typeof google === 'undefined' || !google.maps || !google.maps.DistanceMatrixService) {
                 console.warn('API do Google Maps não disponível, usando cálculo simples.');
                 const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
                 // Estimativa simples: considerar velocidade média de 30km/h
                 const tempoEstimadoMin = Math.round(distanciaKm * 2); // 2 minutos por km (velocidade 30km/h)
-                resolve({
+                
+                const resultado = {
                     distancia: distanciaKm,
                     distanciaTexto: distanciaKm.toFixed(1) + " km",
                     duracao: tempoEstimadoMin,
                     duracaoTexto: tempoEstimadoMin + " min",
                     usandoApiFallback: true
-                });
+                };
+                
+                console.log("Resultado (fallback):", resultado);
+                resolve(resultado);
                 return;
             }
             
-            // Configurar origem e destino
-            const origin = new google.maps.LatLng(originLat, originLng);
-            const destination = new google.maps.LatLng(destLat, destLng);
-            
-            // Criar o serviço Distance Matrix
-            const service = new google.maps.DistanceMatrixService();
-            
-            // Configurar os parâmetros da requisição
-            const request = {
-                origins: [origin],
-                destinations: [destination],
-                travelMode: google.maps.TravelMode.DRIVING, // Modo de viagem (DRIVING, WALKING, etc.)
-                unitSystem: google.maps.UnitSystem.METRIC,
-                avoidHighways: false,
-                avoidTolls: false,
-                drivingOptions: {
-                    departureTime: new Date(), // Viagem agora
-                    trafficModel: google.maps.TrafficModel.BEST_GUESS // Considerar tráfego
-                }
-            };
-            
-            // Fazer a requisição à API
-            service.getDistanceMatrix(request, function(response, status) {
-                if (status === google.maps.DistanceMatrixStatus.OK) {
-                    if (response.rows[0].elements[0].status === google.maps.DistanceMatrixElementStatus.OK) {
-                        const distancia = response.rows[0].elements[0].distance;
-                        const duracao = response.rows[0].elements[0].duration;
-                        const duracaoNoTransito = response.rows[0].elements[0].duration_in_traffic;
-                        
-                        resolve({
-                            distancia: distancia.value / 1000, // Converter metros para km
-                            distanciaTexto: distancia.text,
-                            duracao: Math.round(duracao.value / 60), // Converter segundos para minutos
-                            duracaoTexto: duracao.text,
-                            duracaoNoTransito: duracaoNoTransito ? Math.round(duracaoNoTransito.value / 60) : null,
-                            duracaoNoTransitoTexto: duracaoNoTransito ? duracaoNoTransito.text : null
-                        });
+            try {
+                // Configurar origem e destino
+                const origin = new google.maps.LatLng(originLat, originLng);
+                const destination = new google.maps.LatLng(destLat, destLng);
+                
+                // Criar o serviço Distance Matrix
+                const service = new google.maps.DistanceMatrixService();
+                console.log("Serviço Distance Matrix criado");
+                
+                // Configurar os parâmetros da requisição
+                const request = {
+                    origins: [origin],
+                    destinations: [destination],
+                    travelMode: google.maps.TravelMode.DRIVING, // Modo de viagem (DRIVING, WALKING, etc.)
+                    unitSystem: google.maps.UnitSystem.METRIC,
+                    avoidHighways: false,
+                    avoidTolls: false
+                };
+                
+                console.log("Enviando requisição à API Distance Matrix");
+                
+                // Fazer a requisição à API
+                service.getDistanceMatrix(request, function(response, status) {
+                    console.log("Status da resposta Distance Matrix:", status);
+                    console.log("Resposta completa:", JSON.stringify(response, null, 2));
+                    
+                    if (status === google.maps.DistanceMatrixStatus.OK) {
+                        if (response.rows[0].elements[0].status === google.maps.DistanceMatrixElementStatus.OK) {
+                            const distancia = response.rows[0].elements[0].distance;
+                            const duracao = response.rows[0].elements[0].duration;
+                            
+                            const resultado = {
+                                distancia: distancia.value / 1000, // Converter metros para km
+                                distanciaTexto: distancia.text,
+                                duracao: Math.round(duracao.value / 60), // Converter segundos para minutos
+                                duracaoTexto: duracao.text
+                            };
+                            
+                            console.log("Resultado calculado com sucesso:", resultado);
+                            resolve(resultado);
+                        } else {
+                            console.warn("Não foi possível calcular a rota:", response.rows[0].elements[0].status);
+                            // Fallback para cálculo de Haversine se não for possível calcular a rota
+                            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
+                            const tempoEstimadoMin = Math.round(distanciaKm * 2); // estimativa aproximada
+                            
+                            const resultado = {
+                                distancia: distanciaKm,
+                                distanciaTexto: distanciaKm.toFixed(1) + " km",
+                                duracao: tempoEstimadoMin, 
+                                duracaoTexto: tempoEstimadoMin + " min",
+                                usandoApiFallback: true
+                            };
+                            
+                            console.log("Resultado (fallback após erro de rota):", resultado);
+                            resolve(resultado);
+                        }
                     } else {
-                        // Fallback para cálculo de Haversine se não for possível calcular a rota
-                        console.warn('Não foi possível calcular a rota, usando cálculo simples.');
+                        console.error('Erro na Distance Matrix API:', status);
+                        // Fallback para cálculo simples em caso de erro
                         const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                        const tempoEstimadoMin = Math.round(distanciaKm * 2); // estimativa aproximada
-                        resolve({
+                        const tempoEstimadoMin = Math.round(distanciaKm * 2);
+                        
+                        const resultado = {
                             distancia: distanciaKm,
                             distanciaTexto: distanciaKm.toFixed(1) + " km",
-                            duracao: tempoEstimadoMin, 
+                            duracao: tempoEstimadoMin,
                             duracaoTexto: tempoEstimadoMin + " min",
                             usandoApiFallback: true
-                        });
+                        };
+                        
+                        console.log("Resultado (fallback após erro de API):", resultado);
+                        resolve(resultado);
                     }
-                } else {
-                    console.error('Erro na Distance Matrix API:', status);
-                    // Fallback para cálculo simples em caso de erro
-                    const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                    const tempoEstimadoMin = Math.round(distanciaKm * 2);
-                    resolve({
-                        distancia: distanciaKm,
-                        distanciaTexto: distanciaKm.toFixed(1) + " km",
-                        duracao: tempoEstimadoMin,
-                        duracaoTexto: tempoEstimadoMin + " min",
-                        usandoApiFallback: true
-                    });
-                }
-            });
+                });
+            } catch (error) {
+                console.error("Erro ao executar Distance Matrix API:", error);
+                // Fallback para cálculo simples em caso de exceção
+                const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
+                const tempoEstimadoMin = Math.round(distanciaKm * 2);
+                
+                const resultado = {
+                    distancia: distanciaKm,
+                    distanciaTexto: distanciaKm.toFixed(1) + " km",
+                    duracao: tempoEstimadoMin,
+                    duracaoTexto: tempoEstimadoMin + " min",
+                    usandoApiFallback: true,
+                    erro: error.message
+                };
+                
+                console.log("Resultado (fallback após exceção):", resultado);
+                resolve(resultado);
+            }
         });
     }
     
     // Mantemos a função original como fallback e renomeamos para ser mais específica
     function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
+        console.log(`Calculando distância Haversine de [${lat1}, ${lon1}] para [${lat2}, ${lon2}]`);
+        
         const R = 6371; // Raio da Terra em km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -390,16 +441,23 @@ $(document).ready(function() {
             Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         const distancia = R * c; // Distância em km
+        
+        console.log(`Distância Haversine calculada: ${distancia.toFixed(2)} km`);
         return distancia;
     }
     
     // Função para mostrar as instalações mais próximas (hospitais ou farmácias)
     async function mostrarInstalacoesMaisProximas(tipo) {
+        console.log(`Buscando ${tipo === 'hospital' ? 'hospitais' : 'farmácias'} mais próximos`);
+        
         // Verifica se temos a localização do usuário e os dados das instalações
         if (!window.userLatitude || !window.userLongitude || !healthFacilities.length) {
+            console.error("Dados insuficientes para buscar instalações próximas");
             alert(`Não foi possível encontrar ${tipo === 'hospital' ? 'hospitais' : 'farmácias'} próximos. Verifique sua localização.`);
             return;
         }
+        
+        console.log(`Localização do usuário: [${window.userLatitude}, ${window.userLongitude}]`);
         
         // Filtrar as instalações pelo tipo
         let instalacoesFiltradas = healthFacilities.filter(feature => {
@@ -413,8 +471,11 @@ $(document).ready(function() {
             return false;
         });
         
+        console.log(`Instalações filtradas: ${instalacoesFiltradas.length}`);
+        
         // Se não houver instalações do tipo especificado, mostrar mensagem
         if (instalacoesFiltradas.length === 0) {
+            console.warn(`Nenhuma instalação do tipo ${tipo} encontrada nos dados.`);
             alert(`Não foram encontrados ${tipo === 'hospital' ? 'hospitais' : 'farmácias'} nos dados.`);
             // Usar dados de exemplo se não houver dados reais
             instalacoesFiltradas = createSampleData().filter(feature => {
@@ -425,6 +486,8 @@ $(document).ready(function() {
                 }
                 return false;
             });
+            
+            console.log(`Usando dados de exemplo: ${instalacoesFiltradas.length} instalações`);
         }
         
         // Criar contêiner para a lista com ID específico
@@ -447,8 +510,10 @@ $(document).ready(function() {
         const promessas = [];
         
         // Para cada instalação, iniciamos o cálculo de distância e tempo
-        instalacoesFiltradas.forEach(feature => {
+        instalacoesFiltradas.forEach((feature, index) => {
             const coords = feature.geometry.coordinates;
+            console.log(`Processando instalação ${index + 1}/${instalacoesFiltradas.length}: ${feature.properties.name || "sem nome"}`);
+            
             // Adicionar promessa ao array
             promessas.push(
                 calcularDistanciaETempoGoogle(
@@ -470,7 +535,9 @@ $(document).ready(function() {
         
         // Aguardar que todos os cálculos sejam concluídos
         try {
+            console.log(`Aguardando cálculo de ${promessas.length} rotas...`);
             const resultados = await Promise.all(promessas);
+            console.log("Todos os cálculos foram concluídos!");
             
             // Ordenar por tempo (ou distância se o tempo não estiver disponível)
             resultados.sort((a, b) => {
@@ -485,6 +552,8 @@ $(document).ready(function() {
             const numInstalacoes = Math.min(5, resultados.length);
             const instalacoesMaisProximas = resultados.slice(0, numInstalacoes);
             
+            console.log(`Exibindo ${numInstalacoes} instalações mais próximas`);
+            
             // Limpar o conteúdo de carregamento
             $(`#${containerId}`).empty();
             
@@ -492,6 +561,8 @@ $(document).ready(function() {
             instalacoesMaisProximas.forEach((feature, index) => {
                 const nome = feature.properties.name || `${tipo === 'hospital' ? 'Hospital' : 'Farmácia'} sem nome`;
                 const coords = feature.geometry.coordinates;
+                
+                console.log(`Instalação ${index + 1}: ${nome} - Distância: ${feature.distanceText}, Tempo: ${feature.durationText}`);
                 
                 // Texto para mostrar distância e tempo
                 let infoTexto;
@@ -521,6 +592,8 @@ $(document).ready(function() {
                 const lon = $(this).data('lon');
                 const nome = $(this).data('name');
                 
+                console.log(`Abrindo Google Maps para ${nome} em [${lat}, ${lon}]`);
+                
                 // Abrir o Google Maps com o trajeto da localização do usuário para o destino
                 if (window.userLatitude && window.userLongitude) {
                     // Construir a URL do Google Maps com os parâmetros para direções
@@ -544,7 +617,7 @@ $(document).ready(function() {
             
         } catch (erro) {
             console.error("Erro ao calcular distâncias:", erro);
-            $(`#${containerId}`).html(`<div class="error-message">Erro ao calcular distâncias e tempos. Por favor, tente novamente.</div>`);
+            $(`#${containerId}`).html(`<div class="error-message">Erro ao calcular distâncias e tempos: ${erro.message}. Por favor, tente novamente.</div>`);
         }
     }
 });
