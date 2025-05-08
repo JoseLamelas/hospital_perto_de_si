@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Localizador Saúde</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <!-- Adicionar a API do Google Maps com sua chave -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_API_AQUI&libraries=places"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+
+<!-- Página Inicial -->
+<div data-role="page" id="home-page">
+    <div data-role="header" class="app-header" data-position="fixed">
+        <div class="header-main-content">
+            <div class="greeting-text">
+                <p>Olá</p>
+                <h1 id="location-display">Onde está?</h1>
+            </div>
+            <div class="app-logo">
+                <img src="logo.png" alt="Logo">
+            </div>
+        </div>
+    </div><!-- /header -->
+
+    <div role="main" class="ui-content">
+        <a class="ui-btn location-button-custom"> <i class="fas fa-map-marker-alt"></i> LOCALIZAÇÃO <i class="fas fa-bullseye"></i></a>
+        
+        <!-- Botões em um div separado para isolá-los -->
+        <div class="main-buttons">
+            <a id="hospitals-btn" class="ui-btn option-button-custom hospitals-button-custom"><i class="fas fa-plus-circle"></i> Hospitais <i class="fas fa-plus-circle"></i></a>
+            <a id="pharmacies-btn" class="ui-btn option-button-custom pharmacies-button-custom"><i class="fas fa-plus-circle"></i> Farmácias <i class="fas fa-plus-circle"></i></a>
+        </div>
+        
+        <!-- Container dedicado para listas, completamente separado dos botões -->
+        <div id="facilities-lists-container"></div>
+    </div>
+
+    <div data-role="footer" data-position="fixed" class="app-footer">
+        <div data-role="navbar">
+            <ul>
+                <li>
+                    <a href="#home-page" class="ui-btn-active ui-state-persist custom-home-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none" class="home-svg-icon">
+                            <circle cx="24" cy="24" r="24" fill="#0EBE7E"/>
+                            <path d="M33.4628 22.6502C33.4623 22.6498 33.4618 22.6493 33.4614 22.6488L25.3021 14.5365C24.9544 14.1906 24.492 14 24.0001 14C23.5083 14 23.0459 14.1904 22.698 14.5364L14.543 22.6446C14.5402 22.6473 14.5375 22.6502 14.5347 22.6529C13.8206 23.3671 13.8218 24.5259 14.5383 25.2383C14.8656 25.5639 15.2979 25.7525 15.7601 25.7722C15.7789 25.7741 15.7978 25.775 15.8169 25.775H16.1421V31.7451C16.1421 32.9265 17.1089 33.8877 18.2973 33.8877H21.4895C21.813 33.8877 22.0755 33.6269 22.0755 33.3051V28.6245C22.0755 28.0854 22.5165 27.6469 23.0587 27.6469H24.9415C25.4837 27.6469 25.9248 28.0854 25.9248 28.6245V33.3051C25.9248 33.6269 26.1871 33.8877 26.5108 33.8877H29.7029C30.8914 33.8877 31.8581 32.9265 31.8581 31.7451V25.775H32.1597C32.6514 25.775 33.1138 25.5845 33.4618 25.2386C34.1791 24.525 34.1794 23.3643 33.4628 22.6502Z" fill="white"/>
+                        </svg>
+                    </a>
+                </li>
+                <li><a href="#" data-icon="heart">Favoritos</a></li>
+                <li><a href="#" data-icon="book">Guia</a></li>
+                <li><a href="#" data-icon="comment">Chat</a></li>
+            </ul>
+        </div><!-- /navbar -->
+    </div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Página Morada Manual -->
+<div data-role="page" id="manual-address-page">
+    <div data-role="header" class="app-header">
+         <div class="header-top-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+        <div class="header-main-content">
+            <div class="greeting-text">
+                <p>Olá</p>
+                <h1>Onde está?</h1>
+            </div>
+            <div class="app-logo">
+                <img src="logo.svg" alt="Logo">
+            </div>
+        </div>
+        <a href="#home-page" data-rel="back" data-icon="back" data-iconpos="notext">Voltar</a>
+        <h1>Inserir Morada</h1>
+    </div><!-- /header -->
+    <div role="main" class="ui-content">
+        <form id="manual-address-form">
+            <label for="postal-code">Código Postal:</label>
+            <input type="text" name="postal-code" id="postal-code" value="0000 - 000">
+            <label for="district">Distrito:</label>
+            <input type="text" name="district" id="district" value="Porto">
+            <label for="county">Concelho:</label>
+            <input type="text" name="county" id="county" value="Porto">
+            <label for="parish">Freguesia:</label>
+            <select name="parish" id="parish">
+                <option value="Bonfim">Bonfim</option>
+                <option value="Paranhos">Paranhos</option>
+                <option value="Campanha">Campanha</option>
+                <option value="Aldoar">Aldoar</option>
+                <option value="Cedofeita, Santo Ildefonso, Sé, Miragaia">Cedofeita, Santo Ildefonso, Sé, Miragaia</option>
+            </select>
+            <button type="submit" class="ui-btn ui-btn-b">Confirmar Morada</button>
+        </form>
+    </div><!-- /content -->
+    <div data-role="footer" data-position="fixed" class="app-footer">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#home-page" data-icon="home"></a></li>
+                <li><a href="#" data-icon="heart"></a></li>
+                <li><a href="#" data-icon="book"></a></li>
+                <li><a href="#" data-icon="comment"></a></li>
+            </ul>
+        </div>
+    </div>
+</div><!-- /page -->
+
+<!-- Página de Resultados da Lista -->
+<div data-role="page" id="list-results-page">
+    <div data-role="header" class="app-header" data-position="fixed">
+        <div class="header-top-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+        <div class="header-main-content">
+            <div class="greeting-text">
+                <p>Olá</p>
+                <h1 id="list-location-display">R. de Silva Tapada 115, 4200-501 Porto</h1>
+            </div>
+            <div class="app-logo">
+                <img src="logo.svg" alt="Logo">
+            </div>
+        </div>
+         <a href="#home-page" data-icon="back" data-iconpos="notext">Voltar</a>
+    </div><!-- /header -->
+
+    <div role="main" class="ui-content">
+        <div class="filter-buttons-container">
+            <a href="#" class="ui-btn filter-btn-custom emergency-filter-btn"><i class="fas fa-lightbulb"></i></a>
+            <a href="#" class="ui-btn filter-btn-custom general-filter-btn active">Geral</a>
+            <a href="#" class="ui-btn filter-btn-custom pediatric-filter-btn">Pediatria <i class="fas fa-baby"></i></a>
+        </div>
+
+        <a href="#" id="list-header-btn" class="ui-btn option-button-custom list-header-button-custom"><i class="fas fa-minus-circle"></i> <span id="list-type-title">Hospitais</span> <i class="fas fa-minus-circle"></i></a>
+
+        <ul data-role="listview" id="results-list" data-inset="true">
+            <!-- Itens da lista serão adicionados aqui por JS -->
+        </ul>
+
+        <a href="#" id="load-more-btn" class="ui-btn option-button-custom more-button-custom"><i class="fas fa-plus-circle"></i> mais <i class="fas fa-plus-circle"></i></a>
+        <a href="#" id="toggle-list-type-btn" class="ui-btn option-button-custom toggle-list-button-custom"><i class="fas fa-plus-circle"></i> <span id="toggle-list-type-text">Farmácias</span> <i class="fas fa-plus-circle"></i></a>
+
+    </div><!-- /content -->
+
+</div><!-- /page -->
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93bbc1f879f9675e',t:'MTc0NjU2ODkwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
