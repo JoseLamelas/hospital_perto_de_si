@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Localizador Saúde</title>
+    <!-- jQuery Mobile -->
     <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Scripts na ordem correta -->
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <!-- IMPORTANTE: Carrega a API do Google Maps ANTES de jQuery Mobile para evitar conflitos -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA&libraries=places,geometry"></script>
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="script.js"></script>
@@ -27,161 +29,548 @@
                 <img src="logo.png" alt="Logo">
             </div>
         </div>
-    </div><!-- /header -->
+    </div>
 
-    <div role="main" class="ui-content">
-        <a class="ui-btn location-button-custom"> <i class="fas fa-map-marker-alt"></i> LOCALIZAÇÃO <i class="fas fa-bullseye"></i></a>
+    <div data-role="content" class="ui-content">
+        <a href="tel:808242424" class="ui-btn option-button-custom sos24-button-custom">
+            <i class="fas fa-phone"></i> 
+            Ligar SOS24 
+            <i class="fas fa-phone"></i>
+        </a>
+        <a class="ui-btn location-button-custom">
+            <i class="fas fa-map-marker-alt"></i> LOCALIZAÇÃO <i class="fas fa-bullseye"></i>
+        </a>
         
-        <!-- Botões em um div separado para isolá-los -->
         <div class="main-buttons">
-            <a id="hospitals-btn" class="ui-btn option-button-custom hospitals-button-custom"><i class="fas fa-plus-circle"></i> Hospitais <i class="fas fa-plus-circle"></i></a>
-            <a id="pharmacies-btn" class="ui-btn option-button-custom pharmacies-button-custom"><i class="fas fa-plus-circle"></i> Farmácias <i class="fas fa-plus-circle"></i></a>
+            <a id="hospitals-btn" class="ui-btn option-button-custom hospitals-button-custom">
+                <i class="fas fa-plus-circle"></i> Hospitais <i class="fas fa-plus-circle"></i>
+            </a>
+            <a id="pharmacies-btn" class="ui-btn option-button-custom pharmacies-button-custom">
+                <i class="fas fa-plus-circle"></i> Farmácias <i class="fas fa-plus-circle"></i>
+            </a>
         </div>
         
-        <!-- Container dedicado para listas, completamente separado dos botões -->
         <div id="facilities-lists-container"></div>
     </div>
 
     <div data-role="footer" data-position="fixed" class="app-footer">
-        <div data-role="navbar">
-            <ul>
-                <li>
-                    <a href="#home-page" class="ui-btn-active ui-state-persist custom-home-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none" class="home-svg-icon">
-                            <circle cx="24" cy="24" r="24" fill="#0EBE7E"/>
-                            <path d="M33.4628 22.6502C33.4623 22.6498 33.4618 22.6493 33.4614 22.6488L25.3021 14.5365C24.9544 14.1906 24.492 14 24.0001 14C23.5083 14 23.0459 14.1904 22.698 14.5364L14.543 22.6446C14.5402 22.6473 14.5375 22.6502 14.5347 22.6529C13.8206 23.3671 13.8218 24.5259 14.5383 25.2383C14.8656 25.5639 15.2979 25.7525 15.7601 25.7722C15.7789 25.7741 15.7978 25.775 15.8169 25.775H16.1421V31.7451C16.1421 32.9265 17.1089 33.8877 18.2973 33.8877H21.4895C21.813 33.8877 22.0755 33.6269 22.0755 33.3051V28.6245C22.0755 28.0854 22.5165 27.6469 23.0587 27.6469H24.9415C25.4837 27.6469 25.9248 28.0854 25.9248 28.6245V33.3051C25.9248 33.6269 26.1871 33.8877 26.5108 33.8877H29.7029C30.8914 33.8877 31.8581 32.9265 31.8581 31.7451V25.775H32.1597C32.6514 25.775 33.1138 25.5845 33.4618 25.2386C34.1791 24.525 34.1794 23.3643 33.4628 22.6502Z" fill="white"/>
-                        </svg>
-                    </a>
-                </li>
-                <li><a href="#" data-icon="heart">Favoritos</a></li>
-                <li><a href="#" data-icon="book">Guia</a></li>
-                <li><a href="#" data-icon="comment">Chat</a></li>
-            </ul>
-        </div><!-- /navbar -->
-    </div><!-- /footer -->
-</div><!-- /page -->
-
-<!-- Página Morada Manual -->
-<div data-role="page" id="manual-address-page">
-    <div data-role="header" class="app-header">
-         <div class="header-top-bar">
-            <span class="time">9:41</span>
-            <div class="status-icons">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-full"></i>
-            </div>
-        </div>
-        <div class="header-main-content">
-            <div class="greeting-text">
-                <p>Olá</p>
-                <h1>Onde está?</h1>
-            </div>
-            <div class="app-logo">
-                <img src="logo.svg" alt="Logo">
-            </div>
-        </div>
-        <a href="#home-page" data-rel="back" data-icon="back" data-iconpos="notext">Voltar</a>
-        <h1>Inserir Morada</h1>
-    </div><!-- /header -->
-    <div role="main" class="ui-content">
-        <form id="manual-address-form">
-            <label for="postal-code">Código Postal:</label>
-            <input type="text" name="postal-code" id="postal-code" value="0000 - 000">
-            <label for="district">Distrito:</label>
-            <input type="text" name="district" id="district" value="Porto">
-            <label for="county">Concelho:</label>
-            <input type="text" name="county" id="county" value="Porto">
-            <label for="parish">Freguesia:</label>
-            <select name="parish" id="parish">
-                <option value="Bonfim">Bonfim</option>
-                <option value="Paranhos">Paranhos</option>
-                <option value="Campanha">Campanha</option>
-                <option value="Aldoar">Aldoar</option>
-                <option value="Cedofeita, Santo Ildefonso, Sé, Miragaia">Cedofeita, Santo Ildefonso, Sé, Miragaia</option>
-            </select>
-            <button type="submit" class="ui-btn ui-btn-b">Confirmar Morada</button>
-        </form>
-    </div><!-- /content -->
-    <div data-role="footer" data-position="fixed" class="app-footer">
-        <div data-role="navbar">
-            <ul>
-                <li><a href="#home-page" data-icon="home"></a></li>
-                <li><a href="#" data-icon="heart"></a></li>
-                <li><a href="#" data-icon="book"></a></li>
-                <li><a href="#" data-icon="comment"></a></li>
-            </ul>
-        </div>
+        <nav class="navbar">
+            <a href="#home-page" class="nav-item nav-item-circle active" id="nav-home">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/>
+                        <path d="M9 22V12h6v10"/>
+                        <path d="m2 10.6 10-7.5 10 7.5"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Início</span>
+            </a>
+            
+            <a href="#favorites-page" class="nav-item nav-item-circle" id="nav-favorites">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Favoritos</span>
+            </a>
+            
+            <a href="#guide-page" class="nav-item nav-item-circle" id="nav-guide">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        <path d="M9 8h6"/>
+                        <path d="M9 12h6"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Guia</span>
+            </a>
+            
+            <a href="#contacts-page" class="nav-item nav-item-circle" id="nav-contacts">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Contato</span>
+            </a>
+        </nav>
     </div>
-</div><!-- /page -->
-
-<!-- Página de Resultados da Lista -->
-<div data-role="page" id="list-results-page">
-    <div data-role="header" class="app-header" data-position="fixed">
-        <div class="header-top-bar">
-            <span class="time">9:41</span>
-            <div class="status-icons">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-full"></i>
-            </div>
-        </div>
-        <div class="header-main-content">
-            <div class="greeting-text">
-                <p>Olá</p>
-                <h1 id="list-location-display">R. de Silva Tapada 115, 4200-501 Porto</h1>
-            </div>
-            <div class="app-logo">
-                <img src="logo.svg" alt="Logo">
-            </div>
-        </div>
-         <a href="#home-page" data-icon="back" data-iconpos="notext">Voltar</a>
-    </div><!-- /header -->
-
-    <div role="main" class="ui-content">
-        <div class="filter-buttons-container">
-            <a href="#" class="ui-btn filter-btn-custom emergency-filter-btn"><i class="fas fa-lightbulb"></i></a>
-            <a href="#" class="ui-btn filter-btn-custom general-filter-btn active">Geral</a>
-            <a href="#" class="ui-btn filter-btn-custom pediatric-filter-btn">Pediatria <i class="fas fa-baby"></i></a>
-        </div>
-
-        <a href="#" id="list-header-btn" class="ui-btn option-button-custom list-header-button-custom"><i class="fas fa-minus-circle"></i> <span id="list-type-title">Hospitais</span> <i class="fas fa-minus-circle"></i></a>
-
-        <ul data-role="listview" id="results-list" data-inset="true">
-            <!-- Itens da lista serão adicionados aqui por JS -->
-        </ul>
-
-        <a href="#" id="load-more-btn" class="ui-btn option-button-custom more-button-custom"><i class="fas fa-plus-circle"></i> mais <i class="fas fa-plus-circle"></i></a>
-        <a href="#" id="toggle-list-type-btn" class="ui-btn option-button-custom toggle-list-button-custom"><i class="fas fa-plus-circle"></i> <span id="toggle-list-type-text">Farmácias</span> <i class="fas fa-plus-circle"></i></a>
-
-    </div><!-- /content -->
-
-</div><!-- /page -->
-
-<!-- Para debug: Mostra mensagens de erro da API do Google Maps -->
-<div id="debug-panel" style="position: fixed; bottom: 70px; left: 0; right: 0; z-index: 9999; background: rgba(255,255,255,0.9); padding: 5px; font-size: 12px; display: none; max-height: 150px; overflow-y: auto;">
-    <div id="debug-content"></div>
-    <button id="close-debug" style="padding: 2px 5px; font-size: 10px; margin-top: 5px;">Fechar</button>
 </div>
 
-<script>
-// Script para debug
-$(document).ready(function() {
-    // Verificar se a API do Google está carregada
-    if (typeof google === 'undefined') {
-        $('#debug-panel').show();
-        $('#debug-content').append('<p style="color:red">ERRO: API do Google Maps não carregada!</p>');
-    } else {
-        $('#debug-content').append('<p style="color:green">API do Google Maps carregada com sucesso.</p>');
-        // Mostrar por 2 segundos e depois esconder
-        $('#debug-panel').show().delay(2000).fadeOut();
-    }
+
+<!-- Página de Favoritos -->
+<div data-role="page" id="favorites-page">
+    <div data-role="header" class="app-header" data-position="fixed">
+        <div class="header-main-content">
+            <div class="greeting-text">
+                <p>Seus</p>
+                <h1>Favoritos</h1>
+            </div>
+            <div class="app-logo">
+                <img src="logo.png" alt="Logo">
+            </div>
+        </div>
+
+    </div>
+
+    <div data-role="content" class="ui-content">
+        <div id="favorites-list-container">
+            <div class="no-favorites-message">
+                <h3>Você ainda não adicionou nenhum favorito</h3>
+                <p>Para adicionar favoritos, busque por hospitais ou farmácias na página inicial e toque no botão <i class="fas fa-heart"></i></p>
+            </div>
+        </div>
+    </div>
+   
+    <div data-role="footer" data-position="fixed" class="app-footer">
+        <nav class="navbar">
+            <a href="#home-page" class="nav-item nav-item-circle" id="nav-home">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/>
+                        <path d="M9 22V12h6v10"/>
+                        <path d="m2 10.6 10-7.5 10 7.5"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Início</span>
+            </a>
+            
+            <a href="#favorites-page" class="nav-item nav-item-circle active" id="nav-favorites">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Favoritos</span>
+            </a>
+            
+            <a href="#guide-page" class="nav-item nav-item-circle" id="nav-guide">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        <path d="M9 8h6"/>
+                        <path d="M9 12h6"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Guia</span>
+            </a>
+            
+            <a href="#contacts-page" class="nav-item nav-item-circle" id="nav-contacts">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Contato</span>
+            </a>
+        </nav>
+    </div>
+</div>
+
+<!-- Página do Guia -->
+<div data-role="page" id="guide-page">
+    <div data-role="header" class="app-header" data-position="fixed">
+        <div class="header-main-content">
+            <div class="greeting-text">
+                <p>Guia de</p>
+                <h1>Emergência</h1>
+            </div>
+            <div class="app-logo">
+                <img src="logo.png" alt="Logo">
+            </div>
+        </div>
+    </div>
+
+    <div data-role="content" class="ui-content guide-content">
+        <div class="guide-section">
+            <h2>O que fazer em emergências médicas</h2>
+            
+            <div class="guide-item">
+                <h3><i class="fas fa-heartbeat"></i> Parada Cardíaca</h3>
+                <p>1. Ligue 112 imediatamente<br>2. Inicie compressões cardíacas<br>3. Se disponível, use um DEA (Desfibrilhador Externo Automático)</p>
+            </div>
+            
+            <div class="guide-item">
+                <h3><i class="fas fa-tint"></i> Hemorragia Grave</h3>
+                <p>1. Pressione diretamente sobre o ferimento com um pano limpo<br>2. Mantenha a pressão até a chegada do socorro<br>3. Eleve o membro ferido se possível</p>
+            </div>
+            
+            <div class="guide-item">
+                <h3><i class="fas fa-lungs"></i> Dificuldade Respiratória</h3>
+                <p>1. Mantém a pessoa numa posição confortável<br>2. Assegure que as vias respiratórias estão desobstruídas<br>3. Ligue 112 se a dificuldade persistir</p>
+            </div>
+            
+            <div class="guide-item">
+                <h3><i class="fas fa-dizzy"></i> Desmaio/Perda de Consciência</h3>
+                <p>1. Coloque a pessoa deitada de lado (posição de recuperação)<br>2. Verifique se respira normalmente<br>3. Ligue 112 se não recuperar consciência rapidamente</p>
+            </div>
+        </div>
+        
+        <div class="guide-section">
+            <h2>Primeiros Socorros</h2>
+            
+            <div class="guide-item">
+                <h3><i class="fas fa-fire"></i> Queimaduras</h3>
+                <p>1. Coloque sob água fria corrente por 10-15 minutos<br>2. Não remova vestuário que esteja colado à pele<br>3. Cubra com um pano limpo</p>
+            </div>
+            
+            <div class="guide-item">
+                <h3><i class="fas fa-band-aid"></i> Cortes e Feridas</h3>
+                <p>1. Lave as mãos antes de tratar<br>2. Pare a hemorragia com pressão direta<br>3. Limpe a ferida com água corrente<br>4. Aplique um penso estéril</p>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="footer" data-position="fixed" class="app-footer">
+        <nav class="navbar">
+            <a href="#home-page" class="nav-item nav-item-circle" id="nav-home">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/>
+                        <path d="M9 22V12h6v10"/>
+                        <path d="m2 10.6 10-7.5 10 7.5"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Início</span>
+            </a>
+            
+            <a href="#favorites-page" class="nav-item nav-item-circle" id="nav-favorites">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Favoritos</span>
+            </a>
+            
+            <a href="#guide-page" class="nav-item nav-item-circle active" id="nav-guide">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        <path d="M9 8h6"/>
+                        <path d="M9 12h6"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Guia</span>
+            </a>
+            
+            <a href="#contacts-page" class="nav-item nav-item-circle" id="nav-contacts">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Contato</span>
+            </a>
+        </nav>
+    </div>
+</div>
+
+<!-- Página de Contactos -->
+<div data-role="page" id="contacts-page">
+    <div data-role="header" class="app-header" data-position="fixed">
+        <div class="header-main-content">
+            <div class="greeting-text">
+                <p>Contactos</p>
+                <h1>Emergência</h1>
+            </div>
+            <div class="app-logo">
+                <img src="logo.png" alt="Logo">
+            </div>
+        </div>
+    </div>
+
+    <div data-role="content" class="ui-content contacts-list">
+        <!-- Emergências Gerais -->
+        <div class="contact-category emergency">
+            <h2><i class="fas fa-exclamation-triangle"></i> Emergências Gerais</h2>
+            <div class="contact-item emergency-contact">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Emergências (INEM, Polícia, Bombeiros, GNR, PSP)</h3>
+                    <a href="tel:112" class="contact-number">112</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saúde e Apoio Médico -->
+        <div class="contact-category health">
+            <h2><i class="fas fa-heartbeat"></i> Saúde e Apoio Médico</h2>
+
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Linha Nacional de Saúde Pública</h3>
+                    <p>Informações sobre surtos, vacinação e saúde pública</p>
+                    <a href="tel:300015015" class="contact-number">300 015 015</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+        </div>
+
+        <!-- Envenenamentos -->
+        <div class="contact-category poison">
+            <h2><i class="fas fa-flask"></i> Envenenamentos</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Centro de Informação Antivenenos (CIAV)</h3>
+                    <p>24h/dia – intoxicações por medicamentos, produtos químicos, picadas, etc.</p>
+                    <a href="tel:800250250" class="contact-number">800 250 250</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incêndios -->
+        <div class="contact-category emergency">
+            <h2><i class="fas fa-fire"></i> Incêndios</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Bombeiros (via emergência)</h3>
+                    <a href="tel:112" class="contact-number">112</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medicamentos -->
+        <div class="contact-category health">
+            <h2><i class="fas fa-pills"></i> Medicamentos</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Linha de Informação sobre Medicamentos – INFARMED</h3>
+                    <a href="tel:800222444" class="contact-number">800 222 444</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Apoio Psicológico e Saúde Mental -->
+        <div class="contact-category mental-health">
+            <h2><i class="fas fa-brain"></i> Apoio Psicológico e Saúde Mental</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>SOS Voz Amiga</h3>
+                    <p>Todos os dias das 15h às 00h</p>
+                       <a href="tel:213544545" class="contact-number">213 544 545</a>
+                </div>
+                       <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>VOADES (Vozes Amigas de Esperança)</h3>
+                    <a href="tel:222030707" class="contact-number">222 030 707</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Linha Conversa Amiga (Fundação INATEL)</h3>
+                    <p>Das 14h às 22h</p>
+                    <a href="tel:808237327" class="contact-number">808 237 327</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Idosos -->
+        <div class="contact-category elderly">
+            <h2><i class="fas fa-walking"></i> Idosos</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>SOS Pessoa Idosa – APAV</h3>
+                    <a href="tel:800990100" class="contact-number">800 990 100</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crianças e Jovens -->
+        <div class="contact-category children">
+            <h2><i class="fas fa-child"></i> Crianças e Jovens</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Linha SOS Criança (Instituto de Apoio à Criança)</h3>
+                    <a href="tel:116111" class="contact-number">116 111</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Violência Doméstica e Social -->
+        <div class="contact-category domestic-violence">
+            <h2><i class="fas fa-shield-alt"></i> Violência Doméstica e Social</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Linha Nacional de Emergência Social (LNES)</h3>
+                    <a href="tel:144" class="contact-number">144</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>APAV – Apoio à Vítima</h3>
+                    <a href="tel:116006" class="contact-number">116 006</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doação de Sangue e Transplantes -->
+        <div class="contact-category health">
+            <h2><i class="fas fa-tint"></i> Doação de Sangue e Transplantes</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Instituto Português do Sangue e da Transplantação (IPST)</h3>
+                    <a href="tel:808201820" class="contact-number">808 201 820</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
     
-    $('#close-debug').on('click', function() {
-        $('#debug-panel').hide();
-    });
-});
-</script>
+        <!-- Outros Contactos Úteis -->
+        <div class="contact-category health">
+            <h2><i class="fas fa-info-circle"></i> Outros Contactos Úteis</h2>
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contact-info">
+                    <h3>Linha Verde da Direção-Geral da Saúde (DGS)</h3>
+                    <a href="tel:808911555" class="contact-number">808 911 555</a>
+                </div>
+                <div class="contact-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="footer" data-position="fixed" class="app-footer">
+        <nav class="navbar">
+            <a href="#home-page" class="nav-item nav-item-circle" id="nav-home">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 9v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9"/>
+                        <path d="M9 22V12h6v10"/>
+                        <path d="m2 10.6 10-7.5 10 7.5"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Início</span>
+            </a>
+            
+            <a href="#favorites-page" class="nav-item nav-item-circle" id="nav-favorites">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Favoritos</span>
+            </a>
+            
+            <a href="#guide-page" class="nav-item nav-item-circle active" id="nav-guide">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                        <path d="M9 8h6"/>
+                        <path d="M9 12h6"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Guia</span>
+            </a>
+            
+            <a href="#contacts-page" class="nav-item nav-item-circle" id="nav-contacts">
+                <div class="nav-icon-circle">
+                    <div class="circle-bg"></div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                </div>
+                <span class="nav-label">Contato</span>
+            </a>
+        </nav>
+    </div>
+</div>
 
 </body>
 </html>
