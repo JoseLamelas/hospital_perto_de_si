@@ -498,11 +498,7 @@ function displayFacilitiesList(facilities, containerId, type) {
     
     // Header
     const headerHTML = `
-        <div class="${headerClass}">
-            <i class="fas fa-minus-circle circle-icon"></i>
-            <span>${headerText} Próximos</span>
-            <i class="fas fa-minus-circle circle-icon"></i>
-        </div>
+
     `;
     $(`#${containerId}`).append(headerHTML);
     
