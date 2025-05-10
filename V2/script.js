@@ -1,575 +1,695 @@
+// Estado global da aplicação
+window.appState = {
+    currentVisibleSection: null,
+    userLocation: {
+        latitude: null,
+        longitude: null
+    },
+    favoritos: JSON.parse(localStorage.getItem('favoritos')) || [],
+    healthFacilities: []
+};
+
+// Configuração da API do Google Maps
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA';
+
+// Configurações do jQuery Mobile
+$(document).on('mobileinit', function(){
+    // Configurações específicas
+    $.mobile.defaultPageTransition = 'fade';
+    $.mobile.pushStateEnabled = true;
+    $.mobile.hashListeningEnabled = true;
+});
+
+// Inicialização da aplicação
 $(document).ready(function() {
-    // Estado global para controlar o que está atualmente visível
-    window.currentVisibleSection = null;
+    console.log('Aplicação iniciando...');
+    initializeApp();
+});
+
+// Função principal de inicialização
+function initializeApp() {
+    verifyGoogleMapsAPI();
+    loadHealthFacilities();
+    setupEventHandlers();
+    setupNavigation();
+    loadFavorites();
+}
+
+// Configurar navegação do jQuery Mobile
+function setupNavigation() {
+    // Atualizar navegação quando mudamos de página
+    $(document).on('pagebeforeshow', function(event, data) {
+        const pageId = $(event.target).attr('id');
+        console.log('Mudança de página:', pageId);
+        updateActiveNav(pageId);
+        
+        // Executar ações específicas da página
+        onPageShow(pageId);
+    });
     
-    // Chave da API do Google Maps - SUBSTITUA PELA SUA CHAVE
-    const apiKey = 'AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA';
+    // Custom event handler para navegação
+    $('.nav-item').on('vclick', function(e) {
+        e.preventDefault();
+        
+        const href = $(this).attr('href');
+        console.log('Navegação clicada:', href);
+        
+        if (href && href !== '#') {
+            $.mobile.changePage(href, {
+                transition: 'fade',
+                changeHash: true
+            });
+        }
+        
+        return false;
+    });
+}
+
+// Ações específicas quando página é mostrada
+function onPageShow(pageId) {
+    switch(pageId) {
+        case 'favorites-page':
+            updateFavoritesList();
+            break;
+        case 'contacts-page':
+            // Página de contactos já tem conteúdo estático
+            break;
+        case 'guide-page':
+            // Página de guia já tem conteúdo estático
+            break;
+        case 'home-page':
+            // Página inicial
+            break;
+    }
+}
+
+// Atualizar navegação ativa
+function updateActiveNav(pageId) {
+    console.log('Atualizando navegação ativa para:', pageId);
     
-    // Verificar se a API do Google Maps está carregada corretamente
+    // Use delay para garantir que jQuery Mobile processou
+    setTimeout(function() {
+        // Reset: Remove active de TODOS primeiro
+        $('.nav-item-circle').removeClass('active');
+        $('.nav-item').removeClass('active');
+        
+        // Reset CSS de TODOS os botões
+        $('.circle-bg').css('background', 'transparent');
+        $('.nav-item-circle svg').css('stroke', '#858EA9');
+        
+        const navMap = {
+            'home-page': 'nav-home',
+            'favorites-page': 'nav-favorites',
+            'guide-page': 'nav-guide',
+            'contacts-page': 'nav-contacts'
+        };
+        
+        const navId = navMap[pageId];
+        if (navId) {
+            // Aplica active apenas no botão correto
+            $('#' + navId).addClass('active');
+            $('#' + navId + ' .nav-item-circle').addClass('active');
+            
+            // Aplica CSS apenas no botão correto
+            $('#' + navId + ' .circle-bg').css('background', '#0EBE7E');
+            $('#' + navId + ' svg').css('stroke', 'white');
+            
+            console.log('Navegação ativa:', navId);
+        }
+    }, 100);
+ }
+
+ $(document).on('pageshow', function(event) {
+    const pageId = $(event.target).attr('id');
+    updateActiveNav(pageId);
+});
+
+// Verificar se a API do Google Maps foi carregada
+function verifyGoogleMapsAPI() {
     if (typeof google === 'undefined' || !google.maps) {
-        console.error("ERRO: API do Google Maps não foi carregada corretamente!");
-        alert("A API do Google Maps não foi carregada. Verifique sua conexão com a internet e sua chave de API.");
+        console.error("ERRO: API do Google Maps não foi carregada!");
+        showToast("A API do Google Maps não foi carregada. Algumas funções podem não funcionar.", 'error');
     } else {
         console.log("API do Google Maps carregada com sucesso!");
     }
-    
-    // Carregar o arquivo GeoJSON assim que a página carregar
-    let healthFacilities = [];
-    
+}
+
+// Carregar dados de instalações de saúde
+function loadHealthFacilities() {
     $.ajax({
         url: "hospitais.geojson",
         dataType: "json",
         success: function(data) {
-            healthFacilities = data.features || [];
-            console.log("GeoJSON carregado com sucesso:", healthFacilities.length + " instalações encontradas");
+            window.appState.healthFacilities = data.features || [];
+            console.log("GeoJSON carregado:", window.appState.healthFacilities.length + " instalações");
         },
         error: function(xhr, status, error) {
-            console.error("Erro ao carregar o GeoJSON:", error);
-            // Carregar dados de exemplo em caso de erro
-            healthFacilities = createSampleData();
-            console.log("Usando dados de exemplo:", healthFacilities.length + " instalações de exemplo carregadas");
+            console.error("Erro ao carregar GeoJSON:", error);
+            window.appState.healthFacilities = createSampleData();
+            console.log("Usando dados de exemplo:", window.appState.healthFacilities.length + " instalações");
+            showToast("Dados de demonstração carregados", 'info');
         }
     });
-    
-    // Função para criar dados de exemplo caso o GeoJSON não carregue
-    function createSampleData() {
-        return [
-            {
-                type: "Feature",
-                properties: {
-                    name: "Hospital São João",
-                    amenity: "hospital",
-                    healthcare: "hospital"
-                },
-                geometry: {
-                    type: "Point",
-                    coordinates: [-8.6015, 41.1830]
-                }
-            },
-            {
-                type: "Feature",
-                properties: {
-                    name: "Hospital Santo António",
-                    amenity: "hospital",
-                    healthcare: "hospital"
-                },
-                geometry: {
-                    type: "Point",
-                    coordinates: [-8.6245, 41.1466]
-                }
-            },
-            {
-                type: "Feature",
-                properties: {
-                    name: "Hospital Pedro Hispano",
-                    amenity: "hospital",
-                    healthcare: "hospital"
-                },
-                geometry: {
-                    type: "Point",
-                    coordinates: [-8.6634, 41.1822]
-                }
-            },
-            {
-                type: "Feature",
-                properties: {
-                    name: "Farmácia Sá da Bandeira",
-                    amenity: "pharmacy",
-                    healthcare: "pharmacy"
-                },
-                geometry: {
-                    type: "Point",
-                    coordinates: [-8.6098, 41.1469]
-                }
-            },
-            {
-                type: "Feature",
-                properties: {
-                    name: "Farmácia Clérigos",
-                    amenity: "pharmacy",
-                    healthcare: "pharmacy"
-                },
-                geometry: {
-                    type: "Point",
-                    coordinates: [-8.6154, 41.1457]
-                }
-            }
-        ];
-    }
-    
-    // Configurar o evento de clique no botão de localização
-    $(document).on('click', '.location-button-custom', function(e) {
-        e.preventDefault();
-        obterLocalizacaoUsuario();
-    });
-    
-    // Evento de clique no botão de hospitais
-    $(document).on('click', '#hospitals-btn', function(e) {
-        e.preventDefault();
-        
-        // Se a seção de hospitais já estiver visível (aberta)
-        if (window.currentVisibleSection === 'hospitals') {
-            // Muda o ícone para "+"
-            $(this).find('i.fas').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-            // Fecha a listagem
-            $('#hospitals-list-container').slideUp(400, function() {
-                $(this).remove();
-            });
-            // Atualiza o estado
-            window.currentVisibleSection = null;
-        } else {
-            // Resetar todos os ícones para "+"
-            $('.option-button-custom i.fas').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-            // Mudar apenas este botão para "-"
-            $(this).find('i.fas').removeClass('fa-plus-circle').addClass('fa-minus-circle');
-            
-            // Remover qualquer container existente
-            $('#hospitals-list-container, #pharmacies-list-container').remove();
-            
-            // Verifica se temos a localização do usuário
-            if (window.userLatitude && window.userLongitude) {
-                mostrarInstalacoesMaisProximas('hospital');
-            } else {
-                // Se não temos localização, primeiro obtemos ela
-                obterLocalizacaoUsuario(function() {
-                    mostrarInstalacoesMaisProximas('hospital');
-                });
-            }
-            
-            // Atualizar estado
-            window.currentVisibleSection = 'hospitals';
-        }
-    });
-    
-    // Evento de clique no botão de farmácias
-    $(document).on('click', '#pharmacies-btn', function(e) {
-        e.preventDefault();
-        
-        // Se a seção de farmácias já estiver visível (aberta)
-        if (window.currentVisibleSection === 'pharmacies') {
-            // Muda o ícone para "+"
-            $(this).find('i.fas').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-            // Fecha a listagem
-            $('#pharmacies-list-container').slideUp(400, function() {
-                $(this).remove();
-            });
-            // Atualiza o estado
-            window.currentVisibleSection = null;
-        } else {
-            // Resetar todos os ícones para "+"
-            $('.option-button-custom i.fas').removeClass('fa-minus-circle').addClass('fa-plus-circle');
-            // Mudar apenas este botão para "-"
-            $(this).find('i.fas').removeClass('fa-plus-circle').addClass('fa-minus-circle');
-            
-            // Remover qualquer container existente
-            $('#hospitals-list-container, #pharmacies-list-container').remove();
-            
-            // Verifica se temos a localização do usuário
-            if (window.userLatitude && window.userLongitude) {
-                mostrarInstalacoesMaisProximas('pharmacy');
-            } else {
-                // Se não temos localização, primeiro obtemos ela
-                obterLocalizacaoUsuario(function() {
-                    mostrarInstalacoesMaisProximas('pharmacy');
-                });
-            }
-            
-            // Atualizar estado
-            window.currentVisibleSection = 'pharmacies';
-        }
-    });
-    
-    // Função para obter a localização do usuário
-    function obterLocalizacaoUsuario(callback) {
-        if (navigator.geolocation) {
-            $("#location-display").text("Obtendo sua localização...");
-            
-            navigator.geolocation.getCurrentPosition(
-                function(posicao) {
-                    // Sucesso ao obter a localização
-                    let latitude = posicao.coords.latitude;
-                    let longitude = posicao.coords.longitude;
-                    
-                    console.log("Localização obtida com sucesso:", latitude, longitude);
-                    
-                    // Armazenar as coordenadas para uso posterior
-                    window.userLatitude = latitude;
-                    window.userLongitude = longitude;
-                    
-                    // Obter o endereço a partir das coordenadas
-                    obterEnderecoUsuario(latitude, longitude);
-                    
-                    // Se foi fornecido um callback, execute-o agora
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
-                },
-                function(erro) {
-                    // Erro ao obter a localização
-                    let mensagemErro;
-                    
-                    switch(erro.code) {
-                        case erro.PERMISSION_DENIED:
-                            mensagemErro = "Acesso à localização negado.";
-                            break;
-                        case erro.POSITION_UNAVAILABLE:
-                            mensagemErro = "Localização indisponível.";
-                            break;
-                        case erro.TIMEOUT:
-                            mensagemErro = "Tempo esgotado ao obter localização.";
-                            break;
-                        default:
-                            mensagemErro = "Erro desconhecido.";
-                    }
-                    
-                    console.error("Erro ao obter localização:", mensagemErro);
-                    $("#location-display").text(mensagemErro);
-                    alert("Não foi possível obter sua localização: " + mensagemErro);
-                },
-                { 
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                }
-            );
-        } else {
-            $("#location-display").text("Geolocalização não suportada");
-            alert("Seu navegador não suporta geolocalização.");
-        }
-    }
-    
-    // Função para obter o endereço a partir das coordenadas
-    function obterEnderecoUsuario(latitude, longitude) {
-        // Usando OpenStreetMap Nominatim para geocoding reverso
-        $.ajax({
-            url: "https://nominatim.openstreetmap.org/reverse",
-            method: "GET",
-            data: {
-                format: "json",
-                lat: latitude,
-                lon: longitude,
-                zoom: 18,
-                addressdetails: 1,
-                "accept-language": "pt-PT"
-            },
-            success: function(resposta) {
-                var enderecoCompleto = resposta.display_name || "Endereço não encontrado";
-                var enderecoSimplificado = enderecoCompleto;
+}
 
-                // Extrair apenas rua, freguesia e concelho, se disponíveis
-                if (resposta.address) {
-                    var partes = [];
-                    
-                    // Rua e número
-                    if (resposta.address.road) {
-                        var rua = resposta.address.road;
-                        if (resposta.address.house_number) {
-                            rua += " " + resposta.address.house_number;
-                        }
-                        partes.push(rua);
-                    }
-                    
-                    // Código Postal
-                    if (resposta.address.postcode) {
-                        partes.push(resposta.address.postcode);
-                    }
-                    
-                    // Freguesia
-                    if (resposta.address.suburb) {
-                        partes.push(resposta.address.suburb);
-                    } else if (resposta.address.neighbourhood) {
-                        partes.push(resposta.address.neighbourhood);
-                    }
-                    
-                    // Concelho
-                    if (resposta.address.city) {
-                        partes.push(resposta.address.city);
-                    } else if (resposta.address.town) {
-                        partes.push(resposta.address.town);
-                    }
-                    
-                    // Se temos partes específicas, use-as
-                    if (partes.length > 0) {
-                        enderecoSimplificado = partes.join(", ");
-                    }
-                }
-                
-                console.log("Endereço obtido:", enderecoSimplificado);
-                
-                // Atualizar o texto de localização
-                $("#location-display").text(enderecoSimplificado).addClass('localizacao-obtida');
-                $("#list-location-display").text(enderecoSimplificado);
-            },
-            error: function(xhr, status, error) {
-                console.error("Erro ao obter endereço:", error);
-                $("#location-display").text("Não foi possível obter o endereço");
+// Configurar event handlers
+function setupEventHandlers() {
+    // Localização
+    $(document).on('vclick', '.location-button-custom', function(e) {
+        e.preventDefault();
+        getUserLocation();
+    });
+    
+    // Hospitais
+    $(document).on('vclick', '#hospitals-btn', function(e) {
+        e.preventDefault();
+        toggleFacilityList('hospitals');
+    });
+    
+    // Farmácias
+    $(document).on('vclick', '#pharmacies-btn', function(e) {
+        e.preventDefault();
+        toggleFacilityList('pharmacies');
+    });
+    
+    // Favoritos
+    $(document).on('vclick', '.add-button', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        addToFavorites($(this));
+    });
+    
+    $(document).on('vclick', '.remove-favorite-button', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeFromFavorites($(this));
+    });
+    
+    // Navegação de facilities
+    $(document).on('vclick', '.hospital-item', function(e) {
+        // Verificar se o clique foi no botão
+        if ($(e.target).closest('.add-button, .remove-favorite-button').length) {
+            return;
+        }
+        e.preventDefault();
+        openInGoogleMaps($(this));
+    });
+}
+
+// Obter localização do usuário
+function getUserLocation(callback) {
+    if (!navigator.geolocation) {
+        showToast("Seu navegador não suporta geolocalização", 'error');
+        return;
+    }
+    
+    $("#location-display").text("Obtendo localização...");
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const { latitude, longitude } = position.coords;
+            
+            // Armazenar localização
+            window.appState.userLocation.latitude = latitude;
+            window.appState.userLocation.longitude = longitude;
+            
+            // Obter endereço
+            getUserAddress(latitude, longitude);
+            
+            // Executar callback se fornecido
+            if (typeof callback === 'function') {
+                callback();
             }
+        },
+        function(error) {
+            const errorMessages = {
+                [error.PERMISSION_DENIED]: "Acesso à localização negado",
+                [error.POSITION_UNAVAILABLE]: "Localização indisponível",
+                [error.TIMEOUT]: "Tempo esgotado",
+                default: "Erro desconhecido"
+            };
+            
+            const message = errorMessages[error.code] || errorMessages.default;
+            $("#location-display").text(message);
+            showToast(message, 'error');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+}
+
+// Obter endereço a partir das coordenadas
+function getUserAddress(latitude, longitude) {
+    $.ajax({
+        url: "https://nominatim.openstreetmap.org/reverse",
+        method: "GET",
+        data: {
+            format: "json",
+            lat: latitude,
+            lon: longitude,
+            zoom: 18,
+            addressdetails: 1,
+            "accept-language": "pt-PT"
+        },
+        success: function(response) {
+            const address = formatAddress(response);
+            $("#location-display").text(address).addClass('localizacao-obtida');
+        },
+        error: function() {
+            $("#location-display").text("Endereço não disponível");
+        }
+    });
+}
+
+// Formatar endereço
+function formatAddress(response) {
+    if (!response.address) {
+        return response.display_name || "Endereço não encontrado";
+    }
+    
+    const parts = [];
+    
+    // Rua e número
+    if (response.address.road) {
+        let street = response.address.road;
+        if (response.address.house_number) {
+            street += " " + response.address.house_number;
+        }
+        parts.push(street);
+    }
+    
+    // Código postal
+    if (response.address.postcode) {
+        parts.push(response.address.postcode);
+    }
+    
+    // Freguesia
+    if (response.address.suburb || response.address.neighbourhood) {
+        parts.push(response.address.suburb || response.address.neighbourhood);
+    }
+    
+    // Concelho
+    if (response.address.city || response.address.town) {
+        parts.push(response.address.city || response.address.town);
+    }
+    
+    return parts.length > 0 ? parts.join(", ") : response.display_name;
+}
+
+// Toggle de lista de instalações
+function toggleFacilityList(type) {
+    const buttonId = type === 'hospitals' ? '#hospitals-btn' : '#pharmacies-btn';
+    const containerId = type === 'hospitals' ? '#hospitals-list-container' : '#pharmacies-list-container';
+    const otherContainerId = type === 'hospitals' ? '#pharmacies-list-container' : '#hospitals-list-container';
+    
+    // Reset todos os ícones para "+"
+    $('.option-button-custom i.fas').removeClass('fa-minus-circle').addClass('fa-plus-circle');
+    
+    // Se já estiver aberto, fechar
+    if (window.appState.currentVisibleSection === type) {
+        $(containerId).slideUp(400, function() {
+            $(this).remove();
+        });
+        window.appState.currentVisibleSection = null;
+        return;
+    }
+    
+    // Atualizar ícone do botão atual
+    $(buttonId).find('i.fas').removeClass('fa-plus-circle').addClass('fa-minus-circle');
+    
+    // Remover qualquer container existente
+    $(otherContainerId).remove();
+    
+    // Verifica localização e mostra instalações
+    if (window.appState.userLocation.latitude && window.appState.userLocation.longitude) {
+        showNearbyFacilities(type);
+    } else {
+        getUserLocation(function() {
+            showNearbyFacilities(type);
         });
     }
     
-    // Função simplificada para calcular distância e tempo usando Google Distance Matrix API
-function calcularDistanciaETempoGoogle(originLat, originLng, destLat, destLng) {
-    return new Promise((resolve, reject) => {
-        // Se a API do Google Maps não estiver disponível, usar o cálculo de Haversine
+    window.appState.currentVisibleSection = type;
+}
+
+// Mostrar instalações próximas
+async function showNearbyFacilities(type) {
+    const facilityType = type === 'hospitals' ? 'hospital' : 'pharmacy';
+    const containerId = type === 'hospitals' ? 'hospitals-list-container' : 'pharmacies-list-container';
+    const buttonId = type === 'hospitals' ? '#hospitals-btn' : '#pharmacies-btn';
+    
+    // Filtrar instalações por tipo
+    let facilities = window.appState.healthFacilities.filter(feature => {
+        return feature.properties.amenity === facilityType || 
+               feature.properties.healthcare === facilityType;
+    });
+    
+    if (facilities.length === 0) {
+        // Usar dados de exemplo se não houver dados
+        facilities = createSampleData().filter(feature => {
+            return feature.properties.amenity === facilityType || 
+                   feature.properties.healthcare === facilityType;
+        });
+    }
+    
+    // Criar container
+    const containerHTML = `<div id="${containerId}" style="display:none;">
+        <div class="loading-animation">
+            <i class="fas fa-spinner"></i> Calculando distâncias...
+        </div>
+    </div>`;
+    
+    $(buttonId).after(containerHTML);
+    $(`#${containerId}`).slideDown(500);
+    
+    try {
+        // Calcular distâncias
+        const facilitiesWithDistance = await calculateDistancesToFacilities(facilities);
+        
+        // Ordenar por tempo ou distância
+        facilitiesWithDistance.sort((a, b) => {
+            return (a.duration || a.distance) - (b.duration || b.distance);
+        });
+        
+        // Mostrar top 5
+        const topFacilities = facilitiesWithDistance.slice(0, 5);
+        displayFacilitiesList(topFacilities, containerId, type);
+        
+    } catch (error) {
+        console.error("Erro ao calcular distâncias:", error);
+        $(`#${containerId}`).html(`<div class="error-message">Erro ao calcular distâncias: ${error.message}</div>`);
+    }
+}
+
+// Calcular distâncias para instalações
+async function calculateDistancesToFacilities(facilities) {
+    const userLat = window.appState.userLocation.latitude;
+    const userLng = window.appState.userLocation.longitude;
+    
+    const promises = facilities.map(async (facility) => {
+        const destLat = facility.geometry.coordinates[1];
+        const destLng = facility.geometry.coordinates[0];
+        
+        const result = await calculateDistanceAndTime(userLat, userLng, destLat, destLng);
+        
+        return {
+            ...facility,
+            distance: result.distance,
+            distanceText: result.distanceText,
+            duration: result.duration,
+            durationText: result.durationText,
+            usedFallback: result.usedFallback
+        };
+    });
+    
+    return Promise.all(promises);
+}
+
+// Calcular distância e tempo usando Google Distance Matrix API
+function calculateDistanceAndTime(originLat, originLng, destLat, destLng) {
+    return new Promise((resolve) => {
+        // Verificar disponibilidade da API
         if (typeof google === 'undefined' || !google.maps || !google.maps.DistanceMatrixService) {
-            console.warn('API do Google Maps não disponível, usando cálculo simples.');
-            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-            const tempoEstimadoMin = Math.round(distanciaKm * 2); 
+            // Fallback para cálculo simples
+            const distance = calculateHaversineDistance(originLat, originLng, destLat, destLng);
+            const duration = Math.round(distance * 2); // Estimativa simples
             
             resolve({
-                distancia: distanciaKm,
-                distanciaTexto: distanciaKm.toFixed(1) + " km",
-                duracao: tempoEstimadoMin,
-                duracaoTexto: tempoEstimadoMin + " min",
-                usandoApiFallback: true
+                distance: distance,
+                distanceText: distance.toFixed(1) + " km",
+                duration: duration,
+                durationText: duration + " min",
+                usedFallback: true
             });
             return;
         }
         
         try {
-            // Criar o serviço Distance Matrix
             const service = new google.maps.DistanceMatrixService();
             
-            // Configurar os parâmetros da requisição
             service.getDistanceMatrix({
                 origins: [{lat: originLat, lng: originLng}],
                 destinations: [{lat: destLat, lng: destLng}],
                 travelMode: google.maps.TravelMode.DRIVING,
                 unitSystem: google.maps.UnitSystem.METRIC
-            }, callback);
-            
-            function callback(response, status) {
+            }, function(response, status) {
                 if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
-                    const distancia = response.rows[0].elements[0].distance;
-                    const duracao = response.rows[0].elements[0].duration;
+                    const element = response.rows[0].elements[0];
                     
                     resolve({
-                        distancia: distancia.value / 1000, // metros para km
-                        distanciaTexto: distancia.text,
-                        duracao: Math.round(duracao.value / 60), // segundos para minutos
-                        duracaoTexto: duracao.text
+                        distance: element.distance.value / 1000,
+                        distanceText: element.distance.text,
+                        duration: Math.round(element.duration.value / 60),
+                        durationText: element.duration.text,
+                        usedFallback: false
                     });
                 } else {
-                    console.warn('Não foi possível calcular rota via API, usando cálculo simples.');
-                    const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-                    const tempoEstimadoMin = Math.round(distanciaKm * 2);
+                    // Fallback
+                    const distance = calculateHaversineDistance(originLat, originLng, destLat, destLng);
+                    const duration = Math.round(distance * 2);
                     
                     resolve({
-                        distancia: distanciaKm,
-                        distanciaTexto: distanciaKm.toFixed(1) + " km",
-                        duracao: tempoEstimadoMin,
-                        duracaoTexto: tempoEstimadoMin + " min",
-                        usandoApiFallback: true
+                        distance: distance,
+                        distanceText: distance.toFixed(1) + " km",
+                        duration: duration,
+                        durationText: duration + " min",
+                        usedFallback: true
                     });
                 }
-            }
+            });
         } catch (error) {
-            console.error('Erro ao usar Distance Matrix API:', error);
-            // Fallback para cálculo simples
-            const distanciaKm = calcularDistanciaHaversine(originLat, originLng, destLat, destLng);
-            const tempoEstimadoMin = Math.round(distanciaKm * 2);
+            // Fallback
+            const distance = calculateHaversineDistance(originLat, originLng, destLat, destLng);
+            const duration = Math.round(distance * 2);
             
             resolve({
-                distancia: distanciaKm,
-                distanciaTexto: distanciaKm.toFixed(1) + " km",
-                duracao: tempoEstimadoMin,
-                duracaoTexto: tempoEstimadoMin + " min",
-                usandoApiFallback: true
+                distance: distance,
+                distanceText: distance.toFixed(1) + " km",
+                duration: duration,
+                durationText: duration + " min",
+                usedFallback: true
             });
         }
     });
 }
+
+// Cálculo de distância Haversine (fallback)
+function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Raio da Terra em km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// Exibir lista de instalações
+function displayFacilitiesList(facilities, containerId, type) {
+    $(`#${containerId}`).empty();
     
-    // Mantemos a função original como fallback e renomeamos para ser mais específica
-    function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
-        console.log(`Calculando distância Haversine de [${lat1}, ${lon1}] para [${lat2}, ${lon2}]`);
+    const headerText = type === 'hospitals' ? 'Hospitais' : 'Farmácias';
+    const headerClass = type === 'hospitals' ? 'hospitals-header' : 'hospitals-header';
+    
+    // Header
+    const headerHTML = `
+        <div class="${headerClass}">
+            <i class="fas fa-minus-circle circle-icon"></i>
+            <span>${headerText} Próximos</span>
+            <i class="fas fa-minus-circle circle-icon"></i>
+        </div>
+    `;
+    $(`#${containerId}`).append(headerHTML);
+    
+    // Lista de instalações
+    facilities.forEach((facility) => {
+        const name = facility.properties.name || `${headerText.slice(0, -1)} sem nome`;
+        const coords = facility.geometry.coordinates;
+        const infoText = facility.usedFallback ? 
+            `${facility.distanceText} (aprox. ${facility.durationText})` : 
+            `${facility.distanceText} (${facility.durationText})`;
         
-        const R = 6371; // Raio da Terra em km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distancia = R * c; // Distância em km
+        const itemHTML = `
+            <div class="hospital-item" data-lat="${coords[1]}" data-lon="${coords[0]}" data-name="${name}" data-type="${type}">
+                <div class="hospital-name">
+                    ${name}
+                    <span class="distance-time-info">${infoText}</span>
+                </div>
+                <div class="add-button">
+                    <i class="fas fa-heart"></i>
+                </div>
+            </div>
+        `;
         
-        console.log(`Distância Haversine calculada: ${distancia.toFixed(2)} km`);
-        return distancia;
+        $(`#${containerId}`).append(itemHTML);
+    });
+}
+
+// Abrir no Google Maps
+function openInGoogleMaps($element) {
+    const lat = $element.data('lat');
+    const lon = $element.data('lon');
+    const name = $element.data('name');
+    
+    const userLat = window.appState.userLocation.latitude;
+    const userLng = window.appState.userLocation.longitude;
+    
+    let mapsUrl;
+    if (userLat && userLng) {
+        mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${lat},${lon}&travelmode=driving`;
+    } else {
+        mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
     }
     
-    // Função para mostrar as instalações mais próximas (hospitais ou farmácias)
-    async function mostrarInstalacoesMaisProximas(tipo) {
-        console.log(`Buscando ${tipo === 'hospital' ? 'hospitais' : 'farmácias'} mais próximos`);
+    window.open(mapsUrl, '_blank');
+}
+
+// Gestão de favoritos
+function addToFavorites($button) {
+    const $item = $button.closest('.hospital-item');
+    const name = $item.data('name');
+    const lat = $item.data('lat');
+    const lon = $item.data('lon');
+    const type = $item.data('type');
+    
+    const favorite = {
+        name: name,
+        lat: lat,
+        lon: lon,
+        type: type,
+        id: `${lat}_${lon}` // ID único baseado em coordenadas
+    };
+    
+    // Verificar se já existe
+    const exists = window.appState.favoritos.some(fav => fav.id === favorite.id);
+    
+    if (!exists) {
+        window.appState.favoritos.push(favorite);
+        localStorage.setItem('favoritos', JSON.stringify(window.appState.favoritos));
+        showToast(`${name} adicionado aos favoritos`, 'success');
         
-        // Verifica se temos a localização do usuário e os dados das instalações
-        if (!window.userLatitude || !window.userLongitude || !healthFacilities.length) {
-            console.error("Dados insuficientes para buscar instalações próximas");
-            alert(`Não foi possível encontrar ${tipo === 'hospital' ? 'hospitais' : 'farmácias'} próximos. Verifique sua localização.`);
-            return;
+        // Se estamos na página de favoritos, atualizar a lista
+        if ($.mobile.pageContainer.pagecontainer('getActivePage').attr('id') === 'favorites-page') {
+            updateFavoritesList();
         }
-        
-        console.log(`Localização do usuário: [${window.userLatitude}, ${window.userLongitude}]`);
-        
-        // Filtrar as instalações pelo tipo
-        let instalacoesFiltradas = healthFacilities.filter(feature => {
-            if (tipo === 'hospital') {
-                return feature.properties.amenity === 'hospital' || 
-                       feature.properties.healthcare === 'hospital';
-            } else if (tipo === 'pharmacy') {
-                return feature.properties.amenity === 'pharmacy' || 
-                       feature.properties.healthcare === 'pharmacy';
+    } else {
+        showToast(`${name} já está nos favoritos`, 'info');
+    }
+}
+
+function removeFromFavorites($button) {
+    const $item = $button.closest('.hospital-item');
+    const id = $item.data('id');
+    
+    window.appState.favoritos = window.appState.favoritos.filter(fav => fav.id !== id);
+    localStorage.setItem('favoritos', JSON.stringify(window.appState.favoritos));
+    
+    showToast('Removido dos favoritos', 'success');
+    updateFavoritesList();
+}
+
+// Carregar e exibir favoritos
+function loadFavorites() {
+    // Favoritos são carregados do localStorage na inicialização
+    // Nada específico precisa ser feito aqui
+}
+
+function updateFavoritesList() {
+    const $container = $('#favorites-list-container');
+    
+    if (window.appState.favoritos.length === 0) {
+        $container.html(`
+            <div class="no-favorites-message">
+                <h3>Você ainda não adicionou nenhum favorito</h3>
+                <p>Para adicionar favoritos, busque por hospitais ou farmácias na página inicial e toque no botão <i class="fas fa-heart"></i></p>
+            </div>
+        `);
+        return;
+    }
+    
+    let html = '';
+    window.appState.favoritos.forEach(favorite => {
+        const typeText = favorite.type === 'hospitals' ? '(Hospital)' : '(Farmácia)';
+        html += `
+            <div class="hospital-item" data-lat="${favorite.lat}" data-lon="${favorite.lon}" data-name="${favorite.name}" data-id="${favorite.id}">
+                <div class="hospital-name">
+                    ${favorite.name} <span class="facility-type">${typeText}</span>
+                </div>
+                <div class="remove-favorite-button">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        `;
+    });
+    
+    $container.html(html);
+}
+
+// Mostrar notificações
+function showToast(message, type = 'info') {
+    const toastClass = type === 'error' ? 'error-toast' : 'success-toast';
+    const $toast = $(`<div class="${toastClass}">${message}</div>`);
+    
+    $('body').append($toast);
+    
+    setTimeout(() => {
+        $toast.fadeOut(500, function() {
+            $(this).remove();
+        });
+    }, 3000);
+}
+
+// Criar dados de exemplo (fallback)
+function createSampleData() {
+    return [
+        {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [-8.611, 41.148] // Porto
+            },
+            properties: {
+                name: "Hospital de São João",
+                amenity: "hospital"
             }
-            return false;
-        });
-        
-        console.log(`Instalações filtradas: ${instalacoesFiltradas.length}`);
-        
-        // Se não houver instalações do tipo especificado, mostrar mensagem
-        if (instalacoesFiltradas.length === 0) {
-            console.warn(`Nenhuma instalação do tipo ${tipo} encontrada nos dados.`);
-            alert(`Não foram encontrados ${tipo === 'hospital' ? 'hospitais' : 'farmácias'} nos dados.`);
-            // Usar dados de exemplo se não houver dados reais
-            instalacoesFiltradas = createSampleData().filter(feature => {
-                if (tipo === 'hospital') {
-                    return feature.properties.amenity === 'hospital' || feature.properties.healthcare === 'hospital';
-                } else if (tipo === 'pharmacy') {
-                    return feature.properties.amenity === 'pharmacy' || feature.properties.healthcare === 'pharmacy';
-                }
-                return false;
-            });
-            
-            console.log(`Usando dados de exemplo: ${instalacoesFiltradas.length} instalações`);
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [-8.616, 41.150]
+            },
+            properties: {
+                name: "Farmácia Central",
+                amenity: "pharmacy"
+            }
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [-8.615, 41.147]
+            },
+            properties: {
+                name: "Hospital Santo António",
+                amenity: "hospital"
+            }
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [-8.612, 41.149]
+            },
+            properties: {
+                name: "Farmácia São João",
+                amenity: "pharmacy"
+            }
         }
-        
-        // Criar contêiner para a lista com ID específico
-        let containerId = tipo === 'hospital' ? 'hospitals-list-container' : 'pharmacies-list-container';
-        let containerHTML = `<div id="${containerId}" style="display:none;"><div class="loading-animation"><i class="fas fa-spinner"></i> Calculando distâncias e tempos...</div></div>`;
-        
-        // IMPORTANTE: Inserir a lista na posição correta
-        if (tipo === 'hospital') {
-            // Inserir após o botão de hospitais
-            $('#hospitals-btn').after(containerHTML);
-        } else {
-            // Inserir após o botão de farmácias
-            $('#pharmacies-btn').after(containerHTML);
-        }
-        
-        // Mostrar container com animação
-        $(`#${containerId}`).hide().slideDown(500);
-        
-        // Array para armazenar promessas de cálculo de distância/tempo
-        const promessas = [];
-        
-        // Para cada instalação, iniciamos o cálculo de distância e tempo
-        instalacoesFiltradas.forEach((feature, index) => {
-            const coords = feature.geometry.coordinates;
-            console.log(`Processando instalação ${index + 1}/${instalacoesFiltradas.length}: ${feature.properties.name || "sem nome"}`);
-            
-            // Adicionar promessa ao array
-            promessas.push(
-                calcularDistanciaETempoGoogle(
-                    window.userLatitude, 
-                    window.userLongitude, 
-                    coords[1], // latitude do ponto
-                    coords[0]  // longitude do ponto
-                ).then(resultado => {
-                    // Adicionar resultados ao objeto feature
-                    feature.distance = resultado.distancia;
-                    feature.distanceText = resultado.distanciaTexto;
-                    feature.duration = resultado.duracao;
-                    feature.durationText = resultado.duracaoTexto;
-                    feature.usedFallback = resultado.usandoApiFallback || false;
-                    return feature;
-                })
-            );
-        });
-        
-        // Aguardar que todos os cálculos sejam concluídos
-        try {
-            console.log(`Aguardando cálculo de ${promessas.length} rotas...`);
-            const resultados = await Promise.all(promessas);
-            console.log("Todos os cálculos foram concluídos!");
-            
-            // Ordenar por tempo (ou distância se o tempo não estiver disponível)
-            resultados.sort((a, b) => {
-                if (a.duration && b.duration) {
-                    return a.duration - b.duration;
-                } else {
-                    return a.distance - b.distance;
-                }
-            });
-            
-            // Pegar as 5 mais próximas (ou menos se não houver 5)
-            const numInstalacoes = Math.min(5, resultados.length);
-            const instalacoesMaisProximas = resultados.slice(0, numInstalacoes);
-            
-            console.log(`Exibindo ${numInstalacoes} instalações mais próximas`);
-            
-            // Limpar o conteúdo de carregamento
-            $(`#${containerId}`).empty();
-            
-            // Adicionar cada instalação à lista HTML
-            instalacoesMaisProximas.forEach((feature, index) => {
-                const nome = feature.properties.name || `${tipo === 'hospital' ? 'Hospital' : 'Farmácia'} sem nome`;
-                const coords = feature.geometry.coordinates;
-                
-                console.log(`Instalação ${index + 1}: ${nome} - Distância: ${feature.distanceText}, Tempo: ${feature.durationText}`);
-                
-                // Texto para mostrar distância e tempo
-                let infoTexto;
-                if (feature.usedFallback) {
-                    infoTexto = `${feature.distanceText} (aprox. ${feature.durationText})`;
-                } else {
-                    infoTexto = `${feature.distanceText} (${feature.durationText})`;
-                }
-                
-                // Armazenar as coordenadas como atributos data- para uso no evento de clique
-                const itemHTML = `
-                    <div class="hospital-item" data-lat="${coords[1]}" data-lon="${coords[0]}" data-name="${nome}">
-                        <div class="hospital-name">${nome} <span class="distance-time-info">${infoTexto}</span></div>
-                        <div class="add-button">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                    </div>
-                `;
-                
-                $(`#${containerId}`).append(itemHTML);
-            });
-            
-            // Adicionar evento de clique aos itens da lista para abrir o Google Maps
-            $('.hospital-item').on("click", function() {
-                // Obter as coordenadas do destino e o nome
-                const lat = $(this).data('lat');
-                const lon = $(this).data('lon');
-                const nome = $(this).data('name');
-                
-                console.log(`Abrindo Google Maps para ${nome} em [${lat}, ${lon}]`);
-                
-                // Abrir o Google Maps com o trajeto da localização do usuário para o destino
-                if (window.userLatitude && window.userLongitude) {
-                    // Construir a URL do Google Maps com os parâmetros para direções
-                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${window.userLatitude},${window.userLongitude}&destination=${lat},${lon}&travelmode=driving`;
-                    
-                    // Abrir em uma nova janela/aba
-                    window.open(mapsUrl, '_blank');
-                } else {
-                    // Se não temos a localização do usuário, abrir apenas a localização do destino
-                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                    window.open(mapsUrl, '_blank');
-                }
-            });
-            
-            // Adicionar evento aos botões de adicionar aos favoritos
-            $('.add-button').on("click", function(e) {
-                e.stopPropagation(); // Impedir que o clique se propague para o item pai
-                const nome = $(this).siblings(".hospital-name").text();
-                alert(`${nome} adicionado aos favoritos`);
-            });
-            
-        } catch (erro) {
-            console.error("Erro ao calcular distâncias:", erro);
-            $(`#${containerId}`).html(`<div class="error-message">Erro ao calcular distâncias e tempos: ${erro.message}. Por favor, tente novamente.</div>`);
-        }
-    }
-});
+    ];
+}
