@@ -37,6 +37,7 @@ body {
     font-size: 16px;
     font-weight: normal;
     opacity: 0.9;
+    text-shadow: none !important;
 }
 
 .greeting-text h1 {
@@ -44,6 +45,7 @@ body {
     font-size: 24px;
     font-weight: bold;
     line-height: 1.2;
+    text-shadow: none !important;
 }
 
 #location-display {
@@ -52,11 +54,22 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    text-shadow: none !important;     /* Remove qualquer sombra de texto */
+    -webkit-text-stroke: none !important;  /* Remove contorno */
+    filter: none !important;          /* Remove filtros */
+    opacity: 1 !important;            /* Garantir opacidade total */
     transition: color 0.5s ease-in-out;
 }
 
 .localizacao-obtida {
     color: #ffffff !important;
+    text-shadow: none !important;     /* Remove sombra quando localizado */
+    opacity: 1 !important;            /* Opacidade total */
+}
+
+/* Para jQuery Mobile text glow */
+.ui-header h1 {
+    text-shadow: none !important;
 }
 
 .app-logo img {
@@ -660,4 +673,30 @@ body {
     .nav-item {
         -webkit-tap-highlight-color: transparent;
     }
+}
+
+.text-footer {
+    position: fixed;
+    bottom: 0;          /* Colado no fundo */
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: #f8f9fa;
+    color: #666;
+    font-size: 12px;
+    text-align: center;
+    padding: 7px 10px;
+    z-index: 999;       /* Abaixo da navegação */
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Ajustar o footer de navegação para ficar ACIMA do texto */
+.app-footer {
+    bottom: 40px !important;  /* Fica 30px acima do fundo */
+    /* Resto das propriedades permanecem iguais */
+}
+
+/* Ajustar espaçamento do conteúdo */
+.ui-content {
+    padding-bottom: 125px !important;  /* 65px navegação + 30px texto + 30px espaço */
 }
