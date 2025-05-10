@@ -1,8 +1,19 @@
-/* Global App Styles */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+/* Override jQuery Mobile defaults */
+.ui-page {
+    -webkit-backface-visibility: hidden;
+    background: #f5f5f7;
 }
 
+.ui-content {
+    padding-bottom: 100px !important;
+}
+
+/* Global App Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Header Styles */
 .app-header {
     background: linear-gradient(to right, #43cea2, #185a9d) !important;
     color: white !important;
@@ -10,92 +21,85 @@ body {
     padding: 0 !important;
 }
 
-.app-header .header-top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    padding: 5px 15px;
-    background-color: rgba(0,0,0,0.1); /* Slight transparency for status bar area */
+.app-header.ui-header-fixed {
+    padding-top: 0 !important;
 }
 
-.app-header .header-main-content {
+.header-main-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 15px 15px 15px;
 }
 
-.app-header .greeting-text p {
+.greeting-text p {
     margin: 0;
     font-size: 16px;
     font-weight: normal;
     opacity: 0.9;
 }
 
-.app-header .greeting-text h1 {
+.greeting-text h1 {
     margin: 0;
-    font-size: 24px; /* Adjusted from previous static version */
+    font-size: 24px;
     font-weight: bold;
     line-height: 1.2;
 }
 
-.app-header .app-logo img {
+#location-display {
+    font-size: 16px;
+    margin-top: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    transition: color 0.5s ease-in-out;
+}
+
+.localizacao-obtida {
+    color: #ffffff !important;
+}
+
+.app-logo img {
     width: 45px;
     height: 45px;
 }
 
-/* jQuery Mobile Overrides for Header */
-.app-header.ui-header-fixed {
-    padding-top: 0;
+/* Button Styles */
+.ui-btn {
+    border: none !important;
+    text-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 15px auto !important;
+    width: calc(100% - 40px);
+    max-width: 350px;
+    border-radius: 25px !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
-.app-header .ui-title {
-    margin: 0.6em 15% 0.8em !important; /* Adjust if title is used */
+.sos24-button-custom {
+    background-color: #FF6B6B !important;
+    color: white !important;
+    animation: pulse 2s infinite;
 }
 
-/* Custom Button Styles */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
 .location-button-custom {
     background: linear-gradient(to right, #6a7095, #f07259) !important;
     color: white !important;
-    border: none !important;
-    border-radius: 25px !important;
-    padding: 15px 20px !important;
-    font-size: 16px !important;
-    font-weight: bold !important;
-    text-shadow: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    margin: 20px auto !important;
-    width: calc(100% - 40px);
-    max-width: 350px;
-}
-
-.option-button-custom {
-    border: none !important;
-    border-radius: 25px !important;
-    padding: 15px 20px !important;
-    font-size: 16px !important;
-    text-shadow: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    margin: 0 auto 15px auto !important;
-    width: calc(100% - 40px);
-    max-width: 350px;
-}
-
-.option-button-custom i {
-    font-size: 20px;
 }
 
 .hospitals-button-custom {
     background-color: #545F71 !important;
-    color: white !important;
-}
-
-.hospitals-button-custom i {
     color: white !important;
 }
 
@@ -104,221 +108,19 @@ body {
     color: white !important;
 }
 
-
-
-/* Footer Styles */
-.app-footer .ui-navbar ul {
-    display: flex;
-    justify-content: space-around;
+.ui-btn i {
+    font-size: 20px;
+    color: inherit !important;
 }
 
-.app-footer .ui-navbar li a {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    border-top: 3px solid transparent !important;
-}
-
-.app-footer .ui-navbar li a.ui-btn-active {
-    border-top-color: #2ecc71 !important; /* Green indicator for active tab */
-    background-color: white !important;
-    color: #2ecc71 !important;
-}
-
-.app-footer .ui-icon-home:after {
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M10%2020v-6h4v6h5v-8h3L12%203%202%2012h3v8z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
-}
-.app-footer .ui-icon-heart:after {
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%2021.35l-1.45-1.32C5.4%2015.36%202%2012.28%202%208.5%202%205.42%204.42%203%207.5%203c1.74%200%203.41.81%204.5%202.09C13.09%203.81%2014.76%203%2016.5%203%2019.58%203%2022%205.42%2022%208.5c0%203.78-3.4%206.86-8.55%2011.54L12%2021.35z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
-}
-.app-footer .ui-icon-book:after {
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M18%202H6c-1.1%200-2%20.9-2%202v16c0%201.1.9%202%202%202h12c1.1%200%202-.9%202-2V4c0-1.1-.9-2-2-2zM6%204h5v8l-2.5-1.5L6%2012V4z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
-}
-.app-footer .ui-icon-comment:after {
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M20%202H4c-1.1%200-2%20.9-2%202v18l4-4h14c1.1%200%202-.9%202-2V4c0-1.1-.9-2-2-2zm-2%2012H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z%22%20fill%3D%22%237f8c8d%22%2F%3E%3C%2Fsvg%3E") !important;
-}
-
-.app-footer .ui-btn-active .ui-icon-home:after {
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M10%2020v-6h4v6h5v-8h3L12%203%202%2012h3v8z%22%20fill%3D%22%232ecc71%22%2F%3E%3C%2Fsvg%3E") !important;
-}
-
-/* Location Choice Popup */
-#location-choice-popup {
-    text-align: center;
-}
-#location-choice-popup .ui-content {
-    padding: 20px;
-}
-.location-action-btn.ui-btn-b {
-    background-color: #2ecc71 !important; /* Green button */
-    color: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-}
-.location-action-btn.ui-btn-c {
-    background-color: white !important;
-    color: #2ecc71 !important; /* Green text */
-    border: 1px solid #2ecc71 !important; /* Green border */
-    border-radius: 8px !important;
-}
-
-
-/* List Results Page */
-.filter-buttons-container {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-}
-
-.filter-btn-custom {
-    border-radius: 20px !important;
-    padding: 8px 12px !important;
-    font-size: 14px !important;
-    text-shadow: none !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin: 0 5px !important;
-    flex-grow: 1;
-}
-
-.filter-btn-custom i {
-    margin-right: 5px;
-}
-
-.emergency-filter-btn {
-    background-color: #ff6b6b !important;
-    color: white !important;
-}
-
-.general-filter-btn {
-    background-color: #20c997 !important;
-    color: white !important;
-}
-
-.pediatric-filter-btn {
-    background-color: #a9d8c8 !important;
-    color: #333 !important;
-}
-
-.filter-btn-custom.active {
-    /* Add styles for active filter button if needed, e.g., darker shade */
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
-}
-
-.list-header-button-custom {
-    background-color: #5a6183 !important;
-    color: white !important;
-    margin-bottom: 10px !important;
-}
-
-.list-header-button-custom i {
-    color: white !important;
-}
-
-#results-list .ui-li-static {
-    background-color: #e8ebf0 !important;
-    color: #333 !important;
-    border: 1px solid #d0d3d6 !important;
-    border-radius: 25px !important;
-    padding: 12px 20px !important;
-    font-size: 15px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    margin-bottom: 10px !important; /* Spacing between items */
-}
-
-#results-list .ui-li-static i {
-    font-size: 18px;
-    color: #555;
-}
-
-.more-button-custom {
-    background-color: #e8ebf0 !important;
-    color: #555 !important;
-    margin-top: 10px !important;
-    margin-bottom: 15px !important;
-}
-
-.toggle-list-button-custom {
-    background-color: #adb5bd !important;
-    color: white !important;
-}
-
-.toggle-list-button-custom i {
-    color: white !important;
-}
-
-/* Utility for hiding elements */
-.hidden {
-    display: none !important;
-}
-
-/* Adjustments for fixed header/footer content overlap */
-.ui-header-fixed, .ui-footer-fixed {
-    z-index: 1000 !important;
-}
-
-#home-page .ui-content, 
-#list-results-page .ui-content {
-    padding-top: 80px; /* Adjust based on actual header height */
-    padding-bottom: 60px; /* Adjust based on actual footer height */
-}
-
-#manual-address-page .ui-content {
-     padding-top: 100px; /* Adjust based on actual header height */
-     padding-bottom: 60px;
-}
-
-/* Ensure popups are above other content */
-.ui-popup-container {
-    z-index: 1100 !important; 
-}
-.ui-popup {
-    z-index: 1101 !important;
-}
-
-
-/* Popup Overlay for Frosted Effect 
-.ui-popup-screen.in {
-    background-color: rgba(0, 0, 0, 0.4) !important; /* Semi-transparent black overlay 
-    -webkit-backdrop-filter: blur(5px); 
-    backdrop-filter: blur(5px) !important; 
-}*/
-
-/* Estilo específico para o texto de localização */
-#location-display {
-    font-size: 14px; /* Tamanho da fonte para a localização */
-    margin-top: 5px; /* Espaçamento superior */
-    overflow: hidden; /* Esconde o texto que ultrapassar o limite */
-    text-overflow: ellipsis; /* Adiciona "..." quando o texto for muito longo */
-    max-width: 100%; /* Garante que não ultrapasse o contêiner */
-}
-
-
-/* Transição suave quando a localização é obtida */
-.localizacao-obtida {
-    transition: color 0.5s ease-in-out;
-}
-
-/* Ajuste específico para o texto "Onde está" */
-.greeting-text p {
-    font-size: 16px; /* Mantém o tamanho original */
-    /* Outros estilos permanecem inalterados */
-}
-
-/* Ajuste para garantir que o título h1 continue com o tamanho padrão 
-   exceto para o location-display específico */
-.greeting-text h1:not(#location-display) {
-    font-size: 24px; /* Tamanho padrão dos títulos h1 */
-}
-
-/* Estilos para a lista de hospitais */
-.hospitals-list-container, 
+/* Facilities List Styles */
+.hospitals-list-container,
 .pharmacies-list-container {
     padding: 10px 15px;
     margin-top: 10px;
+    margin-bottom: 15px;
 }
 
-/* Cabeçalho com botões de menos */
 .hospitals-header {
     background-color: #5a6183;
     color: white;
@@ -331,108 +133,6 @@ body {
     text-align: center;
 }
 
-.hospitals-header span {
-    flex-grow: 1;
-    font-size: 18px;
-    font-weight: 500;
-}
-
-.hospitals-header .circle-icon {
-    color: white;
-    font-size: 22px;
-}
-
-/* Item individual de hospital */
-.hospital-item {
-    background-color: #e8ebf0;
-    border-radius: 25px;
-    padding: 12px 20px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.hospital-name {
-    color: #555;
-    font-size: 16px;
-    flex-grow: 1;
-}
-
-/* NOVO: Estilo para informações de distância e tempo */
-.distance-time-info {
-    display: block;
-    color: #777;
-    font-size: 14px;
-    margin-top: 3px;
-    font-weight: normal;
-}
-
-/* Botão de adicionar (símbolo +) */
-.add-button {
-    width: 28px;
-    height: 28px;
-    background-color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #5a6183;
-    border: 1px solid #d0d3d6;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-/* Botão "mais" */
-.more-button {
-    background-color: #e8ebf0;
-    color: #555;
-    border-radius: 25px;
-    padding: 12px 15px;
-    margin-top: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-}
-
-.more-button span {
-    flex-grow: 1;
-}
-
-.more-button .circle-icon {
-    color: #5a6183;
-    font-size: 18px;
-}
-
-/* Container das listas */
-.hospitals-list-container,
-.pharmacies-list-container {
-    padding: 10px 15px;
-    margin-top: 10px;
-    margin-bottom: 15px;
-    overflow: hidden;
-}
-
-/* Animações de transição */
-.hospitals-list-container,
-.pharmacies-list-container {
-    transition: height 0.3s ease-in-out;
-}
-
-/* Cabeçalho da lista */
-.hospitals-header {
-    background-color: #5a6183;
-    color: white;
-    border-radius: 25px;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-}
-
-/* Ajuste para cabeçalho de farmácias */
 .pharmacies-list-container .hospitals-header {
     background-color: #9BA5B7;
 }
@@ -448,7 +148,7 @@ body {
     font-size: 22px;
 }
 
-/* Item individual de instalação */
+/* Facility Item Styles */
 .hospital-item {
     background-color: #e8ebf0;
     border-radius: 25px;
@@ -461,7 +161,8 @@ body {
     cursor: pointer;
 }
 
-.hospital-item:hover {
+.hospital-item:hover,
+.hospital-item:active {
     background-color: #dfe3e9;
 }
 
@@ -469,21 +170,33 @@ body {
     color: #555;
     font-size: 16px;
     flex-grow: 1;
-    white-space: normal; /* Permitir quebra de linha para acomodar informações de distância/tempo */
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Botão de adicionar (símbolo +) */
-.add-button {
+.distance-time-info {
+    font-size: 14px;
+    color: #777;
+    margin-left: 8px;
+}
+
+.facility-type {
+    font-size: 12px;
+    color: #777;
+    margin-left: 5px;
+    display: inline-block;
+}
+
+/* Favorite Button Styles */
+.add-button, .remove-favorite-button {
     width: 28px;
     height: 28px;
     min-width: 28px;
-    background-color: white;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #5a6183;
     border: 1px solid #d0d3d6;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     cursor: pointer;
@@ -491,64 +204,39 @@ body {
     margin-left: 10px;
 }
 
-.add-button:hover {
+.add-button {
+    background-color: white;
+    color: #5a6183;
+}
+
+.remove-favorite-button {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.add-button:hover, .remove-favorite-button:hover {
     transform: scale(1.1);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.add-button:active {
+.remove-favorite-button:hover {
+    background-color: #ff5252;
+}
+
+.add-button:active, .remove-favorite-button:active {
     transform: scale(0.95);
 }
 
-/* Botão "mais" */
-.more-button {
-    background-color: #e8ebf0;
-    color: #555;
-    border-radius: 25px;
-    padding: 12px 15px;
-    margin-top: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.more-button:hover {
-    background-color: #dfe3e9;
-}
-
-.more-button span {
-    flex-grow: 1;
-}
-
-.more-button .circle-icon {
-    color: #5a6183;
-    font-size: 18px;
-}
-
-/* Indicador de distância e tempo */
-.distance-time-info {
-    display: block;
-    color: #777;
-    font-size: 13px;
-    margin-top: 4px;
-    font-weight: normal;
-}
-
-/* Animação de carregamento enquanto calcula distâncias */
+/* Loading Animation */
 .loading-animation {
     text-align: center;
     padding: 20px;
     color: #5a6183;
-    font-size: 16px;
 }
 
 .loading-animation i {
-    animation: spin 1.5s infinite linear;
-    margin-right: 8px;
-    font-size: 18px;
+    animation: spin 1s infinite linear;
+    margin-right: 10px;
 }
 
 @keyframes spin {
@@ -556,18 +244,361 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Mensagem de erro */
-.error-message {
+/* Favorites Page */
+.no-favorites-message {
     text-align: center;
-    padding: 15px;
-    background-color: #ffe5e5;
-    border-radius: 25px;
-    color: #d63031;
-    margin: 10px 0;
-    border: 1px solid #fab1a0;
+    color: #666;
+    padding: 20px;
+    margin-top: 30px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    line-height: 1.6;
 }
 
-/* Ajuste para telas menores */
+.no-favorites-message p {
+    margin: 10px 0;
+}
+
+/* Guide Page */
+.guide-content {
+    padding: 10px;
+}
+
+.guide-section {
+    margin-bottom: 30px;
+}
+
+.guide-section h2 {
+    color: #0EBE7E;
+    font-size: 20px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+}
+
+.guide-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.guide-item h3 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.guide-item h3 i {
+    color: #0EBE7E;
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.guide-item p {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+    ont-size: 16px;  
+}
+
+/* Contacts Page */
+.contacts-list {
+    padding: 10px;
+    padding-bottom: 100px;
+}
+
+.contact-category {
+    margin-bottom: 25px;
+}
+
+.contact-category h2 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-category h2 i {
+    margin-right: 8px;
+}
+
+/* Contact Category Colors */
+.contact-category.emergency h2 {
+    background: #ff6b6b;
+    color: white;
+}
+
+.contact-category.health h2 {
+    background: #0EBE7E;
+    color: white;
+}
+
+.contact-category.poison h2 {
+    background: #ff9800;
+    color: white;
+}
+
+.contact-category.mental-health h2 {
+    background: #9c27b0;
+    color: white;
+}
+
+.contact-category.children h2 {
+    background: #2196f3;
+    color: white;
+}
+
+.contact-category.elderly h2 {
+    background: #795548;
+    color: white;
+}
+
+.contact-category.domestic-violence h2 {
+    background: #f44336;
+    color: white;
+}
+
+/* Contact Item */
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.emergency-contact {
+    background: #fff5f5;
+    border-color: #ff6b6b;
+}
+
+.contact-icon {
+    width: 36px;      /* Reduzido de 40px */
+    height: 36px;     /* Reduzido de 40px */
+    background: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;  /* Reduzido de 12px */
+    flex-shrink: 0;
+    color: #666;
+}
+
+
+.emergency-contact .contact-icon {
+    background: #ff6b6b;
+    color: white;
+}
+
+.contact-info {
+    text-align: center;  /* Centraliza todo o conteúdo */
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-info h3 {
+    font-size: 16px;
+    margin: 0 0 4px 0;
+    color: #333;
+    line-height: 1.4;
+}
+
+.contact-info p {
+    font-size: 13px;
+    color: #666;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.contact-number {
+    display: inline-block;
+    background: #0EBE7E;
+    color: white !important;
+    padding: 6px 12px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.contact-number:hover {
+    background: #0aa665;
+}
+
+.emergency-contact .contact-number {
+    background: #ff6b6b;
+    font-size: 18px;
+    padding: 8px 16px;
+}
+
+.emergency-contact .contact-number:hover {
+    background: #ff5252;
+}
+
+.multiple-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+/* Footer Navigation */
+.app-footer {
+    background: white !important;
+    border-top: 1px solid #e0e0e0 !important;
+    height: 65px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #858EA9;
+    transition: all 0.3s ease;
+    padding: 4px 0;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.nav-item:hover,
+.nav-item:active {
+    background: transparent !important;
+}
+
+.nav-item.active {
+    color: #0EBE7E;
+}
+
+.nav-icon-circle {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.circle-bg {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    background: transparent;
+    transition: all 0.3s ease;
+    top: 0;
+    left: 0;
+}
+
+.nav-item-circle.active .circle-bg {
+    background: #0EBE7E !important;
+    transform: scale(1);
+}
+
+.nav-item-circle:not(.active) .circle-bg {
+    background: transparent;
+}
+
+.nav-item-circle svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: all 0.3s ease;
+    z-index: 1;
+    position: relative;
+}
+
+.nav-item-circle.active svg {
+    stroke: white !important;
+}
+
+.nav-item-circle:not(.active) svg {
+    stroke: #858EA9;
+}
+
+.nav-label {
+    font-size: 11px;
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+/* Toast Notifications */
+.error-toast, .success-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 9999;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+.error-toast {
+    background: #ff6b6b;
+}
+
+.success-toast {
+    background: #0EBE7E;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
 @media (max-width: 480px) {
     .hospital-name {
         font-size: 14px;
@@ -577,99 +608,56 @@ body {
         font-size: 16px;
     }
     
-    .distance-time-info {
+    .contact-info h3 {
+        font-size: 14px;
+    }
+    
+    .contact-info p {
         font-size: 12px;
+    }
+    
+    .contact-number {
+        font-size: 17px;
+        padding: 7px 14px;
+    }
+    
+    .emergency-contact .contact-number {
+        font-size: 16px;
+        padding: 7px 14px;
+    }
+    
+    .guide-item h3 {
+        font-size: 15px;
+    }
+    
+    .guide-item p {
+        font-size: 14px;
     }
 }
 
-/* Estilo para quando nenhuma instalação é encontrada */
-.no-results-message {
-    text-align: center;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 25px;
-    color: #6c757d;
-    margin: 10px 0;
+/* jQuery Mobile Fixes */
+.ui-icon,
+.ui-icon-custom,
+.ui-icon-home,
+.ui-icon-heart,
+.ui-icon-book,
+.ui-icon-comment {
+    display: none !important;
+    background-image: none !important;
 }
 
-/* Classe para quando a localização é obtida com sucesso */
-.localizacao-obtida {
-    color: #ffffff !important;
-    transition: color 0.5s; 
+.ui-page .ui-content {
+    padding-bottom: 80px !important;
 }
 
-/* Destaque para tempo real de trânsito */
-.real-traffic-info {
-    color: #2d3436;
-    font-weight: 500;
+/* Touch feedback */
+.nav-item-circle:active {
+    transform: scale(0.95);
 }
 
-/* Ícone de carro para indicar tempo de condução */
-.travel-mode-icon {
-    margin-right: 4px;
-    color: #636e72;
-}
-
-/* Distância em linha reta (quando fallback é usado) */
-.approx-distance {
-    font-style: italic;
-    opacity: 0.9;
-}
-
-/* Adicione estes estilos ao seu arquivo style.css para melhorar a exibição das informações de trânsito */
-
-/* Contêiner para informações de distância e tempo */
-.distance-time-info {
-    display: block;
-    color: #777;
-    font-size: 13px;
-    margin-top: 6px;
-    font-weight: normal;
-    line-height: 1.4;
-}
-
-/* Informações específicas de trânsito */
-.traffic-info {
-    margin-top: 2px;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-/* Ícone de carro */
-.traffic-info i.fa-car {
-    color: #4a69bd;
-    margin-right: 5px;
-    font-size: 14px;
-}
-
-/* Destaque para atraso no trânsito */
-.traffic-delay {
-    color: #e55039;
-    margin-left: 5px;
-    font-weight: 500;
-}
-
-/* Destaque para trânsito bom */
-.traffic-good {
-    color: #78e08f;
-    margin-left: 5px;
-    font-weight: 500;
-}
-
-/* Ajustes para itens da lista */
-.hospital-item {
-    padding: 15px 20px !important;
-}
-
-.hospital-name {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Nome da instalação em destaque */
-.hospital-name strong {
-    font-size: 16px;
-    color: #2d3436;
-    margin-bottom: 2px;
+/* Remove tap highlight for webkit browsers */
+@media (max-width: 640px) {
+    .nav-item {
+        -webkit-tap-highlight-color: transparent;
+    }
 }
