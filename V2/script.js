@@ -814,3 +814,40 @@ function testActualAPI() {
 
 // Inicia a verificação quando a página carregar
 window.addEventListener('load', checkAPIAvailability);
+
+
+function testAPIOnGitHub() {
+    const isGitHub = window.location.host.includes('github.io');
+    
+    console.log("Testando no GitHub:", isGitHub);
+    
+    if (isGitHub) {
+        // Log adicional para GitHub
+        console.log("URL completa:", window.location.href);
+        console.log("Testando Distance Matrix...");
+        
+        if (typeof google !== 'undefined' && google.maps && google.maps.DistanceMatrixService) {
+            const service = new google.maps.DistanceMatrixService();
+            
+            service.getDistanceMatrix({
+                origins: ['Porto, Portugal'],
+                destinations: ['Lisboa, Portugal'],
+                travelMode: 'DRIVING'
+            }, function(response, status) {
+                console.log("Status no GitHub:", status);
+                
+                if (status === 'OK') {
+                    showToast("API funcionando no GitHub! 🎉", 'success');
+                } else {
+                    showToast(`Erro no GitHub: ${status}`, 'error');
+                    console.error("Detalhes:", response);
+                }
+            });
+        } else {
+            console.error("Google Maps não carregado no GitHub");
+        }
+    }
+}
+
+// Execute após carregamento
+setTimeout(testAPIOnGitHub, 3000);
