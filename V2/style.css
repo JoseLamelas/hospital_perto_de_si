@@ -338,6 +338,10 @@ body {
     border-radius: 8px;
     display: flex;
     align-items: center;
+    text-shadow: none;         /* Remove sombras de texto */
+    filter: none;              /* Remove filtros visuais */
+    background-blend-mode: normal; /* Garante mistura normal do fundo */
+    -webkit-text-stroke: 0;    /* Remove contorno em WebKit (caso haja) */
 }
 
 .contact-category h2 i {
