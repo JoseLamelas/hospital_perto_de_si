@@ -10,7 +10,22 @@ window.appState = {
 };
 
 // Configuração da API do Google Maps
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCWaR3AnCuwhfRtPyAGS_DUyfVKCBxuWy4';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBYvQ3-AIzaSyAid8a3iccEhtGl7oez98a-KvlFFQVPNco';
+
+
+// ADICIONAR AQUI AS CONFIGURAÇÕES DOS ESTABELECIMENTOS
+const FACILITY_CONFIGS = {
+    hospitals: {
+        radius: 20,        // 20km para hospitais
+        maxResults: 5,     // Máximo 5 resultados
+        apiLimit: 10       // Máximo 10 para API
+    },
+    pharmacies: {
+        radius: 5,         // 5km para farmácias
+        maxResults: 5,     // Máximo 8 resultados
+        apiLimit: 15       // Máximo 15 para API
+    }
+};
 
 // Configurações do jQuery Mobile
 $(document).on('mobileinit', function(){
@@ -203,7 +218,7 @@ function getUserLocation(callback) {
         return;
     }
     
-    $("#location-display").text("Obtendo localização...");
+    $("#location-display").text("A obter a sua localização...");
     
     navigator.geolocation.getCurrentPosition(
         function(position) {
@@ -337,6 +352,7 @@ function toggleFacilityList(type) {
 
 // Mostrar instalações próximas
 async function showNearbyFacilities(type) {
+    const config = FACILITY_CONFIGS[type];
     const facilityType = type === 'hospitals' ? 'hospital' : 'pharmacy';
     const containerId = type === 'hospitals' ? 'hospitals-list-container' : 'pharmacies-list-container';
     const buttonId = type === 'hospitals' ? '#hospitals-btn' : '#pharmacies-btn';
@@ -354,24 +370,24 @@ async function showNearbyFacilities(type) {
         });
     }
     
-    // 1. PRIMEIRO: Filtrar por raio de 20km (usando Haversine - sem API)
+    // Filtrar por raio específico
     if (window.appState.userLocation.latitude && window.appState.userLocation.longitude) {
         facilities = filterByRadius(
             facilities, 
             window.appState.userLocation.latitude, 
             window.appState.userLocation.longitude, 
-            20 // Raio de 20km
+            config.radius // Raio específico
         );
         
-        // Se não encontrarmos nenhuma instalação dentro de 20km
         if (facilities.length === 0) {
-            showToast("Nenhuma instalação encontrada num raio de 20km", 'info');
+            const facilityName = type === 'hospitals' ? 'hospital' : 'farmácia';
+            showToast(`Nenhum ${facilityName} encontrado num raio de ${config.radius}km`, 'info');
             return;
         }
     }
     
-    // 2. Limitar a 10 instalações para economizar API calls
-    const limitedFacilities = facilities.slice(0, 10);
+    // Limitar resultados para API
+    const limitedFacilities = facilities.slice(0, config.apiLimit);
     
     // Criar container
     const containerHTML = `<div id="${containerId}" style="display:none;">
@@ -384,7 +400,7 @@ async function showNearbyFacilities(type) {
     $(`#${containerId}`).slideDown(500);
     
     try {
-        // 3. Calcular distâncias precisas apenas para essas 10 instalações
+        // Calcular distâncias precisas
         const facilitiesWithDistance = await calculateDistancesToFacilities(limitedFacilities);
         
         // Ordenar por tempo ou distância
@@ -392,8 +408,8 @@ async function showNearbyFacilities(type) {
             return (a.duration || a.distance) - (b.duration || b.distance);
         });
         
-        // Mostrar top 5
-        const topFacilities = facilitiesWithDistance.slice(0, 5);
+        // Mostrar número específico de resultados
+        const topFacilities = facilitiesWithDistance.slice(0, config.maxResults);
         displayFacilitiesList(topFacilities, containerId, type);
         
     } catch (error) {
@@ -404,13 +420,13 @@ async function showNearbyFacilities(type) {
         let html = `
             <div class="hospitals-header">
                 <i class="fas fa-minus-circle circle-icon"></i>
-                <span>${headerText} Próximos</span>
+                <span>${headerText} (até ${config.radius}km)</span>
                 <i class="fas fa-minus-circle circle-icon"></i>
             </div>
         `;
         
-        // Mostrar 5 instalações sem cálculo de distância
-        limitedFacilities.slice(0, 5).forEach((facility) => {
+        // Mostrar número específico de instalações sem cálculo de distância
+        limitedFacilities.slice(0, config.maxResults).forEach((facility) => {
             const name = facility.properties.name || `${headerText.slice(0, -1)} sem nome`;
             const coords = facility.geometry.coordinates;
             
@@ -552,12 +568,14 @@ function filterByRadius(facilities, userLat, userLng, radiusKm = 20) {
 function displayFacilitiesList(facilities, containerId, type) {
     $(`#${containerId}`).empty();
     
+    const config = FACILITY_CONFIGS[type];
     const headerText = type === 'hospitals' ? 'Hospitais' : 'Farmácias';
-    const headerClass = type === 'hospitals' ? 'hospitals-header' : 'hospitals-header';
     
-    // Header
+    // Header com informação do raio
     const headerHTML = `
-
+        <div class="hospitals-header">
+            <span>${headerText} (até ${config.radius}km)</span>
+        </div>
     `;
     $(`#${containerId}`).append(headerHTML);
     
@@ -760,94 +778,3 @@ function createSampleData() {
         }
     ];
 }
-
-
-
-// Adicione este script para verificar periodicamente se a API está disponível
-function checkAPIAvailability() {
-    let attempts = 0;
-    const maxAttempts = 24; // 2 minutos, testando a cada 5 segundos
-    
-    const checkInterval = setInterval(() => {
-        attempts++;
-        console.log(`Tentativa ${attempts}/${maxAttempts} - Verificando APIs...`);
-        
-        try {
-            if (typeof google !== 'undefined' && google.maps && google.maps.DistanceMatrixService) {
-                console.log("✅ APIs carregadas! Testando funcionamento...");
-                clearInterval(checkInterval);
-                testActualAPI();
-            } else {
-                console.log("⌛ Ainda aguardando APIs...");
-            }
-        } catch (error) {
-            console.log("❌ Erro:", error);
-        }
-        
-        if (attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            console.log("⚠️ Timeout - APIs não carregaram em 2 minutos");
-        }
-    }, 5000); // Testa a cada 5 segundos
-}
-
-// Teste real da API
-function testActualAPI() {
-    const service = new google.maps.DistanceMatrixService();
-    
-    service.getDistanceMatrix({
-        origins: ['Porto, Portugal'],
-        destinations: ['Lisboa, Portugal'],
-        travelMode: 'DRIVING'
-    }, function(response, status) {
-        if (status === 'OK') {
-            console.log("🎉 Distance Matrix API funcionando!");
-            showToast("APIs disponíveis e funcionando!", 'success');
-        } else {
-            console.log("❌ Erro na API:", status);
-            console.log("Pode ser que ainda esteja propagando...");
-            // Tentar novamente em 30 segundos
-            setTimeout(testActualAPI, 30000);
-        }
-    });
-}
-
-// Inicia a verificação quando a página carregar
-window.addEventListener('load', checkAPIAvailability);
-
-
-function testAPIOnGitHub() {
-    const isGitHub = window.location.host.includes('github.io');
-    
-    console.log("Testando no GitHub:", isGitHub);
-    
-    if (isGitHub) {
-        // Log adicional para GitHub
-        console.log("URL completa:", window.location.href);
-        console.log("Testando Distance Matrix...");
-        
-        if (typeof google !== 'undefined' && google.maps && google.maps.DistanceMatrixService) {
-            const service = new google.maps.DistanceMatrixService();
-            
-            service.getDistanceMatrix({
-                origins: ['Porto, Portugal'],
-                destinations: ['Lisboa, Portugal'],
-                travelMode: 'DRIVING'
-            }, function(response, status) {
-                console.log("Status no GitHub:", status);
-                
-                if (status === 'OK') {
-                    showToast("API funcionando no GitHub! 🎉", 'success');
-                } else {
-                    showToast(`Erro no GitHub: ${status}`, 'error');
-                    console.error("Detalhes:", response);
-                }
-            });
-        } else {
-            console.error("Google Maps não carregado no GitHub");
-        }
-    }
-}
-
-// Execute após carregamento
-setTimeout(testAPIOnGitHub, 3000);
