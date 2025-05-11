@@ -199,7 +199,7 @@ function setupEventHandlers() {
 // Obter localização do usuário
 function getUserLocation(callback) {
     if (!navigator.geolocation) {
-        showToast("Seu navegador não suporta geolocalização", 'error');
+        showToast("O seu browser não suporta geolocalização", 'error');
         return;
     }
     
@@ -358,7 +358,7 @@ async function showNearbyFacilities(type) {
     // Criar container
     const containerHTML = `<div id="${containerId}" style="display:none;">
         <div class="loading-animation">
-            <i class="fas fa-spinner"></i> Calculando distâncias...
+            <i class="fas fa-spinner"></i> A calcular as distâncias...
         </div>
     </div>`;
     
@@ -601,8 +601,8 @@ function updateFavoritesList() {
     if (window.appState.favoritos.length === 0) {
         $container.html(`
             <div class="no-favorites-message">
-                <h3>Você ainda não adicionou nenhum favorito</h3>
-                <p>Para adicionar favoritos, busque por hospitais ou farmácias na página inicial e toque no botão <i class="fas fa-heart"></i></p>
+                <h3>Ainda não adicionou nenhum favorito</h3>
+                <p>Para adicionar favoritos, procure por hospitais ou farmácias na página inicial e toque no botão <i class="fas fa-heart"></i></p>
             </div>
         `);
         return;
@@ -665,6 +665,7 @@ function createSampleData() {
                 amenity: "pharmacy"
             }
         },
+        // Adicionar mais exemplos...
         {
             type: "Feature",
             geometry: {
@@ -685,6 +686,17 @@ function createSampleData() {
             properties: {
                 name: "Farmácia São João",
                 amenity: "pharmacy"
+            }
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "Point",
+                coordinates: [-8.610, 41.146]
+            },
+            properties: {
+                name: "Centro Hospitalar do Porto",
+                amenity: "hospital"
             }
         }
     ];
