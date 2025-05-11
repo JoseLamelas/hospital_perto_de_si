@@ -348,12 +348,30 @@ async function showNearbyFacilities(type) {
     });
     
     if (facilities.length === 0) {
-        // Usar dados de exemplo se não houver dados
         facilities = createSampleData().filter(feature => {
             return feature.properties.amenity === facilityType || 
                    feature.properties.healthcare === facilityType;
         });
     }
+    
+    // 1. PRIMEIRO: Filtrar por raio de 20km (usando Haversine - sem API)
+    if (window.appState.userLocation.latitude && window.appState.userLocation.longitude) {
+        facilities = filterByRadius(
+            facilities, 
+            window.appState.userLocation.latitude, 
+            window.appState.userLocation.longitude, 
+            20 // Raio de 20km
+        );
+        
+        // Se não encontrarmos nenhuma instalação dentro de 20km
+        if (facilities.length === 0) {
+            showToast("Nenhuma instalação encontrada num raio de 20km", 'info');
+            return;
+        }
+    }
+    
+    // 2. Limitar a 10 instalações para economizar API calls
+    const limitedFacilities = facilities.slice(0, 10);
     
     // Criar container
     const containerHTML = `<div id="${containerId}" style="display:none;">
@@ -366,8 +384,8 @@ async function showNearbyFacilities(type) {
     $(`#${containerId}`).slideDown(500);
     
     try {
-        // Calcular distâncias
-        const facilitiesWithDistance = await calculateDistancesToFacilities(facilities);
+        // 3. Calcular distâncias precisas apenas para essas 10 instalações
+        const facilitiesWithDistance = await calculateDistancesToFacilities(limitedFacilities);
         
         // Ordenar por tempo ou distância
         facilitiesWithDistance.sort((a, b) => {
@@ -380,7 +398,35 @@ async function showNearbyFacilities(type) {
         
     } catch (error) {
         console.error("Erro ao calcular distâncias:", error);
-        $(`#${containerId}`).html(`<div class="error-message">Erro ao calcular distâncias: ${error.message}</div>`);
+        
+        // Se falhar o cálculo, mostrar mesmo assim sem distâncias
+        const headerText = type === 'hospitals' ? 'Hospitais' : 'Farmácias';
+        let html = `
+            <div class="hospitals-header">
+                <i class="fas fa-minus-circle circle-icon"></i>
+                <span>${headerText} Próximos</span>
+                <i class="fas fa-minus-circle circle-icon"></i>
+            </div>
+        `;
+        
+        // Mostrar 5 instalações sem cálculo de distância
+        limitedFacilities.slice(0, 5).forEach((facility) => {
+            const name = facility.properties.name || `${headerText.slice(0, -1)} sem nome`;
+            const coords = facility.geometry.coordinates;
+            
+            html += `
+                <div class="hospital-item" data-lat="${coords[1]}" data-lon="${coords[0]}" data-name="${name}" data-type="${type}">
+                    <div class="hospital-name">
+                        ${name}
+                    </div>
+                    <div class="add-button">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+            `;
+        });
+        
+        $(`#${containerId}`).html(html);
     }
 }
 
@@ -488,6 +534,19 @@ function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
 }
+
+// Filtrar instalações dentro de 20km do usuário
+function filterByRadius(facilities, userLat, userLng, radiusKm = 20) {
+    return facilities.filter(facility => {
+        const distance = calculateHaversineDistance(
+            userLat, userLng, 
+            facility.geometry.coordinates[1], 
+            facility.geometry.coordinates[0]
+        );
+        return distance <= radiusKm;
+    });
+}
+
 
 // Exibir lista de instalações
 function displayFacilitiesList(facilities, containerId, type) {
@@ -701,3 +760,57 @@ function createSampleData() {
         }
     ];
 }
+
+
+
+// Adicione este script para verificar periodicamente se a API está disponível
+function checkAPIAvailability() {
+    let attempts = 0;
+    const maxAttempts = 24; // 2 minutos, testando a cada 5 segundos
+    
+    const checkInterval = setInterval(() => {
+        attempts++;
+        console.log(`Tentativa ${attempts}/${maxAttempts} - Verificando APIs...`);
+        
+        try {
+            if (typeof google !== 'undefined' && google.maps && google.maps.DistanceMatrixService) {
+                console.log("✅ APIs carregadas! Testando funcionamento...");
+                clearInterval(checkInterval);
+                testActualAPI();
+            } else {
+                console.log("⌛ Ainda aguardando APIs...");
+            }
+        } catch (error) {
+            console.log("❌ Erro:", error);
+        }
+        
+        if (attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            console.log("⚠️ Timeout - APIs não carregaram em 2 minutos");
+        }
+    }, 5000); // Testa a cada 5 segundos
+}
+
+// Teste real da API
+function testActualAPI() {
+    const service = new google.maps.DistanceMatrixService();
+    
+    service.getDistanceMatrix({
+        origins: ['Porto, Portugal'],
+        destinations: ['Lisboa, Portugal'],
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            console.log("🎉 Distance Matrix API funcionando!");
+            showToast("APIs disponíveis e funcionando!", 'success');
+        } else {
+            console.log("❌ Erro na API:", status);
+            console.log("Pode ser que ainda esteja propagando...");
+            // Tentar novamente em 30 segundos
+            setTimeout(testActualAPI, 30000);
+        }
+    });
+}
+
+// Inicia a verificação quando a página carregar
+window.addEventListener('load', checkAPIAvailability);
