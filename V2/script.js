@@ -10,7 +10,7 @@ window.appState = {
 };
 
 // Configuração da API do Google Maps
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBYvQ3-klK4PRfJPpTH0lNlG1z7AaShPVA123';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBYvQ3-AIzaSyAid8a3iccEhtGl7oez98a-KvlFFQVPNco';
 
 // Configurações do jQuery Mobile
 $(document).on('mobileinit', function(){
